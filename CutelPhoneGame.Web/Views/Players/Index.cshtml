@@ -1,4 +1,46 @@
-﻿@{
-    ViewBag.Title = "Users";
+﻿@using CutelPhoneGame.Core.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PlayersViewModel
+@{
+    ViewBag.Title = "Players";
 }
 
+<div class="container-sm mt-2">
+    <div class="card mb-2">
+        <div class="card-header">
+            Players
+        </div>
+
+        <div class="card-body">
+            <span class="text-muted fst-italic">No Actions Available</span>
+        </div>
+    </div>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+
+    <table class="table table-bordered align-middle">
+        <tr>
+            <th>Pin</th>
+            <th>Unique Captures</th>
+            <th>Total Captures</th>
+            <th>Actions</th>
+        </tr>
+        
+        @foreach (PlayerModel player in Model.Players)
+        {
+            <tr>
+                <td>@player.Pin</td>
+                <td>@(player.Captures!.GroupBy(c => c.FromNumber).Count())</td>
+                <td>@player.Captures!.Count</td>
+                <td>
+                    <form method="POST" asp-action="Delete">
+                        <input type="hidden" name="pin" value="@player.Pin" />
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+</div>

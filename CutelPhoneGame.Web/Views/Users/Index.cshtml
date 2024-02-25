@@ -1,4 +1,56 @@
-﻿@{
+﻿@using CutelPhoneGame.Core.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model UsersViewModel
+@{
     ViewBag.Title = "Users";
 }
 
+<div class="container-sm mt-2">
+    <div class="card mb-2">
+        <div class="card-header">
+            Users
+        </div>
+
+        <div class="card-body">
+            <form method="POST" asp-action="Create">
+                <div class="mb-2">
+                    <label class="form-label" for="createUser-name">Username</label>
+                    <input type="text" class="form-control" name="username" id="createUser-name"/>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label" for="createUser-password">Password</label>
+                    <input type="password" class="form-control" name="password" id="createUser-password"/>
+                </div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-success mt-2">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+
+    <table class="table table-bordered align-middle">
+        <tr>
+            <th>Username</th>
+            <th>Actions</th>
+        </tr>
+        
+        @foreach (UserModel user in Model.Users)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>
+                    <form method="POST" asp-action="Delete">
+                        <input type="hidden" name="username" value="@user.Username" />
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+</div>

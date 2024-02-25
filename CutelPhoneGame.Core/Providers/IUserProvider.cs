@@ -12,6 +12,8 @@ namespace CutelPhoneGame.Core.Providers
         Task<List<UserModel>> GetAllAsync();
         Task<(List<UserModel> Users, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10);
         Task<UserModel> CreateAsync(UserModel model);
+        Task DeleteByIdAsync(uint id);
+        Task DeleteByUsernameAsync(string username);
         Task UpdateHashedPasswordAsync(uint id, string hashedPassword);
     }
 }

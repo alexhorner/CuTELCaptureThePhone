@@ -70,6 +70,28 @@ namespace CutelPhoneGame.Data.Postgres.Providers
             return newUser.ToModel();
         }
 
+        public async Task DeleteByIdAsync(uint id)
+        {
+            User? user = await db.Users.SingleOrDefaultAsync(e => e.Id == id);
+
+            if (user is null) throw new KeyNotFoundException($"Unable to find user with id '{id}'");
+
+            db.Remove(user);
+            
+            await db.SaveChangesAsync();
+        }
+
+        public async Task DeleteByUsernameAsync(string username)
+        {
+            User? user = await db.Users.SingleOrDefaultAsync(e => e.Username == username);
+
+            if (user is null) throw new KeyNotFoundException($"Unable to find user with username '{username}'");
+
+            db.Remove(user);
+            
+            await db.SaveChangesAsync();
+        }
+
         public async Task UpdateHashedPasswordAsync(uint id, string hashedPassword)
         {
             if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("hashedPassword cannot be null or whitespace", nameof(hashedPassword));

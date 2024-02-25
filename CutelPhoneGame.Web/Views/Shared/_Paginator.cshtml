@@ -1,0 +1,80 @@
+﻿@using System.Dynamic
+@model PaginatorPartialViewModel
+@{
+    int previousPages = Convert.ToInt32(Model.CurrentPage) - Convert.ToInt32(Math.Floor(Convert.ToDouble(10 / 2)));
+    int nextPages = Convert.ToInt32(Model.CurrentPage) + Convert.ToInt32(Math.Floor(Convert.ToDouble(10 / 2)));
+
+    if (previousPages <= 0)
+    {
+        previousPages = 0;
+        nextPages = Model.MaxPage > 10 ? 10 : Model.MaxPage;
+    }
+
+    if (nextPages >= Model.MaxPage)
+    {
+        previousPages = Model.MaxPage - 10 < 0 ? 0 : Model.MaxPage - 10;
+        nextPages = Model.MaxPage;
+    }
+
+    string pageSwitchController = Model.PageSwitchController.EndsWith("Controller")
+        ? Model.PageSwitchController[..^10 /*Length of "Controller"*/]
+        : Model.PageSwitchController;
+}
+<ul class="pagination justify-content-center">
+    <li class="page-item @(Model.CurrentPage == 0 ? "disabled" : "")">
+        @{
+            dynamic routeValues = new ExpandoObject();
+            IDictionary<string, object?> routeValuesDictionary = (IDictionary<string, object?>)routeValues;
+            routeValuesDictionary.Add("page", 0);
+        }
+        <a class="page-link" href="@Url.Action(Model.PageSwitchAction, pageSwitchController, (object)routeValues)">
+            <span>&lArr;</span>
+        </a>
+    </li>
+    
+    <li class="page-item @(Model.CurrentPage == 0 ? "disabled" : "")">
+        @{
+            routeValues = new ExpandoObject();
+            routeValuesDictionary = (IDictionary<string, object?>)routeValues;
+            routeValuesDictionary.Add("page", Model.CurrentPage - 1);
+        }
+        <a class="page-link" href="@Url.Action(Model.PageSwitchAction, pageSwitchController, (object)routeValues)">
+            <span>&lt;</span>
+        </a>
+    </li>
+
+    @for (int pagePos = previousPages; pagePos <= nextPages; pagePos++)
+    {
+        routeValues = new ExpandoObject();
+        routeValuesDictionary = (IDictionary<string, object?>)routeValues;
+        routeValuesDictionary.Add("page", pagePos);
+
+        <li class="page-item @(pagePos == Model.CurrentPage ? "active" : "")">
+            <a class="page-link" href="@Url.Action(Model.PageSwitchAction, pageSwitchController, (object)routeValues)">
+                <span>@pagePos</span>
+            </a>
+        </li>
+    }
+
+    <li class="page-item @(Model.CurrentPage == Model.MaxPage ? "disabled" : "")">
+        @{
+            routeValues = new ExpandoObject();
+            routeValuesDictionary = (IDictionary<string, object?>)routeValues;
+            routeValuesDictionary.Add("page", Model.CurrentPage + 1);
+        }
+        <a class="page-link" href="@Url.Action(Model.PageSwitchAction, pageSwitchController, (object)routeValues)">
+            <span>&gt;</span>
+        </a>
+    </li>
+    
+    <li class="page-item @(Model.CurrentPage == Model.MaxPage ? "disabled" : "")">
+        @{
+            routeValues = new ExpandoObject();
+            routeValuesDictionary = (IDictionary<string, object?>)routeValues;
+            routeValuesDictionary.Add("page", Model.MaxPage);
+        }
+        <a class="page-link" href="@Url.Action(Model.PageSwitchAction, pageSwitchController, (object)routeValues)">
+            <span>&rArr;</span>
+        </a>
+    </li>
+</ul>

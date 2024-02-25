@@ -13,5 +13,7 @@ namespace CutelPhoneGame.Core.Providers
         Task<(List<PlayerModel> Players, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10, bool orderByLeaderboard = false);
         Task<int?> GetLeaderboardPositionAsync(uint id);
         Task<PlayerModel> CreateAsync(PlayerModel model);
+        Task DeleteByIdAsync(uint id);
+        Task DeleteByPinAsync(uint pin);
     }
 }

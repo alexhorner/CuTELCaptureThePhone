@@ -28,7 +28,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
 
         public Task<int> GetCountAsync() => db.Players.CountAsync();
 
-        public Task<List<PlayerModel>> GetAllAsync() => db.Players.OrderBy(e => e.Pin).Select(e => e.ToModel(true)).ToListAsync();
+        public Task<List<PlayerModel>> GetAllAsync() => db.Players.Include(e => e.Captures).OrderBy(e => e.Pin).Select(e => e.ToModel(false)).ToListAsync();
 
         public async Task<(List<PlayerModel> Players, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10, bool orderByLeaderboard = false)
         {
@@ -36,7 +36,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
 
             int totalPlayers = await db.Players.CountAsync();
             
-            IQueryable<Player> playersQuery = db.Players.AsQueryable();
+            IQueryable<Player> playersQuery = db.Players.Include(e => e.Captures);
 
             playersQuery = orderByLeaderboard ? playersQuery.OrderBy(e => e.Captures!.Count()) : playersQuery.OrderBy(e => e.Pin);
                 
@@ -46,7 +46,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
             
             if (maxPage < 0) maxPage = 0;
             
-            return (await playersQuery.Select(e => e.ToModel(true)).ToListAsync(), new PaginationModel
+            return (await playersQuery.Select(e => e.ToModel(false)).ToListAsync(), new PaginationModel
             {
                 CurrentPage = page,
                 MaxPage = maxPage,
@@ -81,6 +81,30 @@ namespace CutelPhoneGame.Data.Postgres.Providers
             }
 
             return newPlayer.ToModel();
+        }
+
+        public async Task DeleteByIdAsync(uint id)
+        {
+            Player? player = await db.Players.Include(e => e.Captures).SingleOrDefaultAsync(e => e.Id == id);
+
+            if (player is null) throw new KeyNotFoundException($"Unable to find player with id '{id}'");
+
+            db.RemoveRange(player.Captures!);
+            db.Remove(player);
+            
+            await db.SaveChangesAsync();
+        }
+
+        public async Task DeleteByPinAsync(uint pin)
+        {
+            Player? player = await db.Players.Include(e => e.Captures).SingleOrDefaultAsync(e => e.Pin == pin);
+
+            if (player is null) throw new KeyNotFoundException($"Unable to find player with pin '{pin}'");
+
+            db.RemoveRange(player.Captures!);
+            db.Remove(player);
+            
+            await db.SaveChangesAsync();
         }
     }
 }
