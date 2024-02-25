@@ -20,6 +20,18 @@
                              <button class="nav-link text-danger">Log Out (@AuthenticationManager.CurrentUser!.Username)</button>
                          </form>
                      </li>
+                     
+                     <li class="nav-item">
+                         <a class="nav-link" asp-controller="Users" asp-action="Index" asp-area="">Users</a>
+                     </li>
+                     
+                     <li class="nav-item">
+                         <a class="nav-link" asp-controller="Players" asp-action="Index" asp-area="">Players</a>
+                     </li>
+                     
+                     <li class="nav-item">
+                         <a class="nav-link" asp-controller="Leaderboard" asp-action="Index" asp-area="">Leaderboard</a>
+                     </li>
                  }
             </ul>
         </div>

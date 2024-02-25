@@ -3,7 +3,7 @@
 namespace CutelPhoneGame.Web.Areas.Api
 {
     [Area("Api")]
-    public class LeaderboardsController : Controller
+    public class LeaderboardController : Controller
     {
         
     }
