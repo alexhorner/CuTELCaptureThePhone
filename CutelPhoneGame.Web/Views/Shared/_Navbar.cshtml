@@ -13,7 +13,7 @@
         
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                 @if (AuthenticationManager.IsLoggedIn)
+                 @if (AuthenticationManager.IsLoggedIn && ViewBag.IgnoreNavItems as bool? is null or false)
                  {
                      <li class="nav-item">
                          <form method="POST" asp-controller="Auth" asp-action="Logout">
