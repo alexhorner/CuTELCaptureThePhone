@@ -2,4 +2,19 @@
     ViewBag.Title = "Home Page";
 }
 
-Nothing to see here
+@section StyleOverrides
+{
+    <style>
+        .center-box {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+}
+
+<div class="center-box">
+    <h1 class="text-center">Welcome to the CuTEL Phone Game</h1>
+    <p class="text-center">Select an option from the navbar to continue</p>
+</div>
