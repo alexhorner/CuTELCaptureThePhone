@@ -30,9 +30,11 @@
     <table class="table table-bordered align-middle">
         <tr>
             <th>Position</th>
-            <th>Pin</th>
+            <th>PIN</th>
             <th>Unique Captures</th>
             <th>Total Captures</th>
+            <th>First Capture</th>
+            <th>Latest Capture</th>
         </tr>
 
         @foreach (PlayerModel player in Model.Players)
@@ -42,6 +44,8 @@
                 <td>@player.Pin</td>
                 <td>@(player.Captures!.GroupBy(c => c.FromNumber).Count())</td>
                 <td>@player.Captures!.Count</td>
+                <td>@player.Captures.OrderBy(c => c.Created).First().FromNumber</td>
+                <td>@player.Captures.OrderBy(c => c.Created).Last().FromNumber</td>
             </tr>
 
             count++;
