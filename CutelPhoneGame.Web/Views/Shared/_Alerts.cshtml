@@ -1,0 +1,26 @@
+﻿@{
+    string? error = TempData["Error"] as string;
+    string? warning = TempData["Warning"] as string;
+    string? message = TempData["Message"] as string;
+
+    //Forces whitespace to null
+    if (string.IsNullOrWhiteSpace(error)) error = null;
+    if (string.IsNullOrWhiteSpace(warning)) warning = null;
+    if (string.IsNullOrWhiteSpace(message)) message = null;
+}
+<div class="container-sm mt-2">
+    @if (error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@error</div>
+    }
+    
+    @if (warning is not null)
+    {
+        <div class="alert alert-warning" role="alert">@warning</div>
+    }
+    
+    @if (message is not null)
+    {
+        <div class="alert alert-success" role="alert">@message</div>
+    }
+</div>

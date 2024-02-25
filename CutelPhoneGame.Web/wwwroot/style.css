@@ -1,0 +1,24 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    height: 100%;
+    min-height: 100%;
+}
+
+main {
+    margin: 0 0 6rem 0;
+}
+
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3.5rem;
+    padding: 1rem;
+    width: 100%;
+    overflow: hidden;
+    background-color: #E7E8E9;
+}

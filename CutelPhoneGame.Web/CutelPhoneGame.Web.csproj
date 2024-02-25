@@ -101,6 +101,21 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\LICENSE.txt" />
       <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
+      <_ContentIncludedByDefault Remove="Controllers\Auth\ForgotPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Controllers\Auth\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Controllers\Auth\Register.cshtml" />
+      <_ContentIncludedByDefault Remove="Controllers\Auth\VerifyEmail.cshtml" />
+      <_ContentIncludedByDefault Remove="Controllers\Auth\VerifyForgotPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Models\Auth\ForgotPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Models\Auth\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Models\Auth\Register.cshtml" />
+      <_ContentIncludedByDefault Remove="Models\Auth\VerifyEmail.cshtml" />
+      <_ContentIncludedByDefault Remove="Models\Auth\VerifyForgotPassword.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\css\" />
+      <Folder Include="wwwroot\js\" />
     </ItemGroup>
 
 </Project>

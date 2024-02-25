@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log In";
+}
+
+@section StyleOverrides
+{
+    <style>
+        .login-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 25rem;
+        }
+    </style>
+}
+
+<div class="card login-card">
+    <div class="card-header">
+        Log in
+    </div>
+
+    <div class="card-body">
+        <form method="POST" asp-controller="Auth" asp-action="Index">
+            @if (Model.ReturnUrl is not null)
+            {
+                <input type="hidden" name="returnUrl" value="@Model.ReturnUrl"/>
+            }
+
+            <div class="mb-3">
+                <label for="login-username" class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" id="login-username">
+            </div>
+
+            <div class="mb-3">
+                <label for="login-password" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" id="login-password">
+            </div>
+
+            <div class="d-flex flex-row-reverse">
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,24 +1,15 @@
 using System.Diagnostics;
+using CutelPhoneGame.Web.Authentication.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using CutelPhoneGame.Web.Models;
 
 namespace CutelPhoneGame.Web.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
+        [AuthenticatedOnly(suppressMessages: true)]
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
