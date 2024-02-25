@@ -1,5 +1,6 @@
 ﻿using CutelPhoneGame.Core.Models;
 using CutelPhoneGame.Core.Providers;
+using CutelPhoneGame.Web.Authentication.Attributes;
 using CutelPhoneGame.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace CutelPhoneGame.Web.Controllers
     public class LeaderboardController(IPlayerProvider playerProvider) : Controller
     {
         [HttpGet]
+        [AuthenticatedOnly]
         public async Task<IActionResult> Index([FromQuery] int? page)
         {
             page ??= 0;
