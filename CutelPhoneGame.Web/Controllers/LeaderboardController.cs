@@ -16,15 +16,15 @@ namespace CutelPhoneGame.Web.Controllers
             
             if (page < 0) page = 0;
 
-            (List<PlayerModel> Players, PaginationModel Pagination) paginatedUsers = await playerProvider.GetAllPaginatedAsync(page.Value, orderByLeaderboard: true);
+            (List<PlayerModel> Players, PaginationModel Pagination) paginatedPlayers = await playerProvider.GetAllPaginatedAsync(page.Value, orderByLeaderboard: true);
             
             return View(new BasicLeaderboardViewModel
             {
-                Players = paginatedUsers.Players,
+                Players = paginatedPlayers.Players,
                 Pagination = new PaginatorPartialViewModel
                 {
-                    CurrentPage = paginatedUsers.Pagination.CurrentPage,
-                    MaxPage = paginatedUsers.Pagination.MaxPage,
+                    CurrentPage = paginatedPlayers.Pagination.CurrentPage,
+                    MaxPage = paginatedPlayers.Pagination.MaxPage,
                     PageSwitchController = nameof(LeaderboardController),
                     PageSwitchAction = nameof(Index)
                 }
