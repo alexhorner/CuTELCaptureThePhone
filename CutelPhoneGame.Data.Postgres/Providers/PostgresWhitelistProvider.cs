@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Data;
+using System.Text.RegularExpressions;
 using CutelPhoneGame.Core.Enums;
 using CutelPhoneGame.Core.Models;
 using CutelPhoneGame.Core.Providers;
@@ -80,7 +81,16 @@ namespace CutelPhoneGame.Data.Postgres.Providers
 
             db.NumberWhitelist.Add(newWhitelistEntry);
             
-            await db.SaveChangesAsync();
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                if (e.InnerException!.Message.Contains("duplicate key")) throw new DuplicateNameException("A conflicting entry already exists");
+
+                throw;
+            }
 
             return newWhitelistEntry.ToModel();
         }
