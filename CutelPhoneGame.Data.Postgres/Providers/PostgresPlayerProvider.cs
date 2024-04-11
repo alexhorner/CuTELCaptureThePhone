@@ -11,6 +11,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
         public Task<bool> ExistsByIdAsync(uint id) => db.Players.AnyAsync(e => e.Id == id);
 
         public Task<bool> ExistsByPinAsync(uint pin) => db.Players.AnyAsync(e => e.Pin == pin);
+        public Task<bool> ExistsByNameAsync(string name) => db.Players.AnyAsync(e => e.Name.ToLower() == name.ToLower());
 
         public async Task<PlayerModel?> GetByIdAsync(uint id)
         {
@@ -26,9 +27,20 @@ namespace CutelPhoneGame.Data.Postgres.Providers
             return player?.ToModel();
         }
 
+        public async Task<PlayerModel?> GetByNameAsync(string name)
+        {
+            Player? player = await db.Players.SingleOrDefaultAsync(e =>  e.Name.ToLower() == name.ToLower());
+
+            return player?.ToModel();
+        }
+
         public Task<int> GetCountAsync() => db.Players.CountAsync();
 
         public Task<List<PlayerModel>> GetAllAsync() => db.Players.Include(e => e.Captures).OrderBy(e => e.Pin).Select(e => e.ToModel(false)).ToListAsync();
+
+        public Task<List<uint>> GetAllPinsAsync() => db.Players.Select(e => e.Pin).ToListAsync();
+
+        public Task<List<string>> GetAllNamesAsync() => db.Players.Select(e => e.Name).ToListAsync();
 
         public async Task<(List<PlayerModel> Players, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10, bool orderByLeaderboard = false)
         {

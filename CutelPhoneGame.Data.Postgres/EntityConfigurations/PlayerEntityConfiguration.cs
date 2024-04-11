@@ -12,11 +12,13 @@ namespace CutelPhoneGame.Data.Postgres.EntityConfigurations
             builder.HasKey(e => e.Id);
 
             builder.HasIndex(e => e.Pin).IsUnique();
+            builder.HasIndex(e => e.Name).IsUnique();
             
             //Columns
             builder.Property(e => e.Id).IsRequired();
 
             builder.Property(e => e.Pin).IsRequired();
+            builder.Property(e => e.Name).IsRequired();
             builder.Property(e => e.RegisteredFromNumber).IsRequired();
 
             builder.Property(e => e.Created).IsRequired();

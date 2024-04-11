@@ -2,7 +2,7 @@
 
 namespace CutelPhoneGame.Web.Models.Api
 {
-    public class LeaderboardPlayerStatsApiModel : ApiPlayerModel
+    public class LeaderboardStatsPublicPlayerApiModel : PublicPlayerApiModel
     {
         public uint Position { get; set; }
         public int UniqueCaptures { get; set; }
@@ -11,9 +11,9 @@ namespace CutelPhoneGame.Web.Models.Api
         public string LatestCapture { get; set; } = null!;
         public LeaderboardPlayerPeriodsApiModel Periods { get; set; } = null!;
         
-        public static LeaderboardPlayerStatsApiModel FromModel(PlayerModel model, uint position, int uniqueCaptures, int totalCaptures, string firstCapture, string latestCapture, LeaderboardPlayerPeriodsApiModel periods) => new()
+        public static LeaderboardStatsPublicPlayerApiModel FromModel(PlayerModel model, uint position, int uniqueCaptures, int totalCaptures, string firstCapture, string latestCapture, LeaderboardPlayerPeriodsApiModel periods) => new()
         {
-            Pin = model.Pin,
+            Name = model.Name,
             RegisteredFromNumber = model.RegisteredFromNumber,
             Position = position,
             UniqueCaptures = uniqueCaptures,

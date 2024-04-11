@@ -5,6 +5,7 @@
         public uint Id { get; set; }
 
         public uint Pin { get; set; }
+        public string Name { get; set; } = null!;
         public string RegisteredFromNumber { get; set; } = null!;
 
         public DateTime Created { get; set; }

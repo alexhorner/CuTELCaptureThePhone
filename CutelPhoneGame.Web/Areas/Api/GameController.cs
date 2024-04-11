@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using CutelPhoneGame.Core;
 using CutelPhoneGame.Core.Models;
 using CutelPhoneGame.Core.Providers;
 using CutelPhoneGame.Web.ApiAuthentication.Attributes;
@@ -9,7 +10,7 @@ namespace CutelPhoneGame.Web.Areas.Api
 {
     [Area("Api")]
     [ApiAuthenticatedOnly]
-    public class GameController(IConfiguration configuration, IBlacklistProvider blacklistProvider, IWhitelistProvider whitelistProvider, IPlayerProvider playerProvider, ICaptureProvider captureProvider) : Controller
+    public class GameController(IConfiguration configuration, IBlacklistProvider blacklistProvider, IWhitelistProvider whitelistProvider, IPlayerProvider playerProvider, ICaptureProvider captureProvider, PlayerUniquePinGenerator playerUniquePinGenerator, PlayerUniqueNamesetGenerator playerUniqueNamesetGenerator) : Controller
     {
         [HttpPost]
         public async Task<IActionResult> Register([FromQuery] string fromNumber)
@@ -20,26 +21,17 @@ namespace CutelPhoneGame.Web.Areas.Api
                 Message = "This number is not allowed to be used in the game"
             });
             
-            //Generate maximum possible pin
-            int pinLength = configuration.GetValue<int>("PinLength");
-            
-            string maxPin = "";
-            
-            for (int i = 0; i < pinLength; i++) maxPin += "9";
-            
-            //Generate valid pins until we hit an available one, then create the player and send back the result
-            ushort tries = 100;
+            //Generate unique pin
+            ushort tries = 5;
             uint generatedPin = 0;
 
-            while (tries != 0) //TODO AH: This is a crap implementation which will get slower, more resource intensive and eventually break as more people register
+            while (tries != 0)
             {
                 tries--;
-                
-                generatedPin = (uint) Random.Shared.Next(1, int.Parse(maxPin));
 
-                PlayerModel? existingPlayer = await playerProvider.GetByPinAsync(generatedPin);
+                generatedPin = playerUniquePinGenerator.GenerateNewPin();
 
-                if (existingPlayer is null) break;
+                if (!await playerProvider.ExistsByPinAsync(generatedPin)) break;
             }
 
             if (tries == 0) return StatusCode(500, new SimpleResponseModel
@@ -47,15 +39,50 @@ namespace CutelPhoneGame.Web.Areas.Api
                 Message = "Failed to generate a pin"
             });
             
-            PlayerModel createdPlayer = await playerProvider.CreateAsync(new PlayerModel
+            //Generate unique name
+            tries = 5;
+            string generatedName = "";
+            
+            while (tries != 0)
             {
-                Pin = generatedPin,
-                RegisteredFromNumber = fromNumber
+                tries--;
+
+                generatedName = playerUniqueNamesetGenerator.GenerateNewName();
+
+                if (!await playerProvider.ExistsByNameAsync(generatedName)) break;
+            }
+
+            if (tries == 0) return StatusCode(500, new SimpleResponseModel
+            {
+                Message = "Failed to generate a name"
             });
+            
+            //Create the player
+            PlayerModel createdPlayer;
+            
+            try
+            {
+                createdPlayer = await playerProvider.CreateAsync(new PlayerModel
+                {
+                    Pin = generatedPin,
+                    Name = generatedName,
+                    RegisteredFromNumber = fromNumber
+                });
+            }
+            catch
+            {
+                playerUniquePinGenerator.ReleaseFailedPin(generatedPin);
+                throw;
+            }
+
+            string[] nameParts = generatedName.ToLower().Split(' ');
 
             return Ok(new RegisteredPlayerApiModel
             {
-                Pin = createdPlayer.Pin
+                Pin = createdPlayer.Pin,
+                NamePartA = nameParts[0],
+                NamePartB = nameParts[1],
+                NamePartC = nameParts[2]
             });
         }
 

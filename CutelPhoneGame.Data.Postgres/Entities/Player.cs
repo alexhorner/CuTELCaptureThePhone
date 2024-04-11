@@ -7,6 +7,7 @@ namespace CutelPhoneGame.Data.Postgres.Entities
         public uint Id { get; set; }
 
         public uint Pin { get; set; }
+        public string Name { get; set; } = null!;
         public string RegisteredFromNumber { get; set; } = null!;
 
         public DateTime Created { get; set; }
@@ -19,6 +20,7 @@ namespace CutelPhoneGame.Data.Postgres.Entities
         {
             Id = Id,
             Pin = Pin,
+            Name = Name,
             RegisteredFromNumber = RegisteredFromNumber,
             Created = Created,
             Updated = Updated,
@@ -29,6 +31,7 @@ namespace CutelPhoneGame.Data.Postgres.Entities
         public static Player FromModel(PlayerModel model) => new()
         {
             Pin = model.Pin,
+            Name = model.Name,
             RegisteredFromNumber = model.RegisteredFromNumber
         };
     }

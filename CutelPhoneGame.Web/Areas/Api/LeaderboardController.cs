@@ -19,8 +19,8 @@ namespace CutelPhoneGame.Web.Areas.Api
 
             return Ok(new PublicLeaderboardApiModel
             {
-                MostUniqueCapturesPlayer = mostUniqueCapturesPlayer is null ? null : ApiPlayerModel.FromModel(mostUniqueCapturesPlayer),
-                MostCapturesOverallPlayer = mostCapturesOverall is null ? null : ApiPlayerModel.FromModel(mostCapturesOverall),
+                MostUniqueCapturesPlayer = mostUniqueCapturesPlayer is null ? null : PublicPlayerApiModel.FromModel(mostUniqueCapturesPlayer),
+                MostCapturesOverallPlayer = mostCapturesOverall is null ? null : PublicPlayerApiModel.FromModel(mostCapturesOverall),
                 PlayerStats = paginatedPlayers.Players.Select(p =>
                 {
                     int uniqueCaptures = p.Captures!.GroupBy(c => c.FromNumber).Count();
@@ -28,7 +28,7 @@ namespace CutelPhoneGame.Web.Areas.Api
                     CaptureModel firstCapture = p.Captures!.OrderBy(c => c.Created).First();
                     CaptureModel latestCapture = p.Captures!.OrderBy(c => c.Created).Last();
                     
-                    return LeaderboardPlayerStatsApiModel.FromModel(p, count++, uniqueCaptures, p.Captures!.Count, firstCapture.FromNumber, latestCapture.FromNumber, new LeaderboardPlayerPeriodsApiModel
+                    return LeaderboardStatsPublicPlayerApiModel.FromModel(p, count++, uniqueCaptures, p.Captures!.Count, firstCapture.FromNumber, latestCapture.FromNumber, new LeaderboardPlayerPeriodsApiModel
                     {
                         UniqueCapturesWithin1Hour = p.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(1)).GroupBy(c => c.FromNumber).Count(),
                         UniqueCapturesWithin12Hours = p.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(12)).GroupBy(c => c.FromNumber).Count(),

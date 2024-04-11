@@ -12,5 +12,16 @@ namespace CutelPhoneGame.Core.Extensions
             
             return url;
         }
+        
+        public static string ToUpperFirstLetter(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return "";
+            
+            char[] characters = str.ToCharArray();
+            
+            characters[0] = char.ToUpper(characters[0]);
+            
+            return new string(characters);
+        }
     }
 }

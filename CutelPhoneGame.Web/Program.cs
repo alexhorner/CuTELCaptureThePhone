@@ -1,4 +1,7 @@
 using System.Data;
+using CutelPhoneGame.Core;
+using CutelPhoneGame.Core.Extensions;
+using CutelPhoneGame.Core.Providers;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Serilog;
@@ -55,6 +58,9 @@ builder.Services
 
 //Other services
 builder.Services.AddCutelPhoneGamePostgres(builder.Configuration.GetConnectionString("Default")!);
+
+builder.Services.AddSingleton<PlayerUniquePinGenerator>();
+builder.Services.AddSingleton<PlayerUniqueNamesetGenerator>();
 
 //Final initialisation
 WebApplication app = builder.Build();
@@ -117,6 +123,53 @@ using (IServiceScope scope = app.Services.CreateScope())
 }
 
 #endregion
+
+//Configure pin generator
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    PlayerUniquePinGenerator playerUniquePinGenerator = scope.ServiceProvider.GetRequiredService<PlayerUniquePinGenerator>();
+    IPlayerProvider playerProvider = scope.ServiceProvider.GetRequiredService<IPlayerProvider>();
+
+    int pinLength = builder.Configuration.GetValue<int>("PinLength");
+            
+    string maxPin = "";
+            
+    for (int i = 0; i < pinLength; i++) maxPin += "9";
+
+    uint[] usedPins = (await playerProvider.GetAllPinsAsync()).ToArray();
+
+    playerUniquePinGenerator.Configure(int.Parse(maxPin), usedPins);
+}
+
+//Configure nameset and nameset generator
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    PlayerUniqueNamesetGenerator playerUniqueNamesetGenerator = scope.ServiceProvider.GetRequiredService<PlayerUniqueNamesetGenerator>();
+    IPlayerProvider playerProvider = scope.ServiceProvider.GetRequiredService<IPlayerProvider>();
+    
+    List<string> nameAParts = Directory.GetFiles(builder.Configuration.GetValue<string>("NameAPartsDirectory")!)
+        .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+        .Order()
+        .ToList();
+    
+    List<string> nameBParts = Directory.GetFiles(builder.Configuration.GetValue<string>("NameBPartsDirectory")!)
+        .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+        .Order()
+        .ToList();
+    
+    List<string> nameCParts = Directory.GetFiles(builder.Configuration.GetValue<string>("NameCPartsDirectory")!)
+        .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+        .Order()
+        .ToList();
+
+    NamesetParts namesetParts = new NamesetParts(nameAParts, nameBParts, nameCParts);
+
+    (int PartA, int PartB, int PartC)[] usedNamesets = (await playerProvider.GetAllNamesAsync())
+        .Select(namesetParts.GetNamesetFromName)
+        .ToArray();
+    
+    playerUniqueNamesetGenerator.Configure(namesetParts, usedNamesets);
+}
 
 //Run application
 app.Run();

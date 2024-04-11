@@ -20,6 +20,7 @@
 
     <table class="table table-bordered align-middle">
         <tr>
+            <th>Name</th>
             <th>PIN</th>
             <th>Unique Captures</th>
             <th>Total Captures</th>
@@ -28,7 +29,8 @@
         @foreach (PlayerModel player in Model.Players)
         {
             <tr>
-                <td>@player.Pin</td>
+                <td>@player.Name</td>
+                <td>@player.Pin.ToString("D4")</td>
                 <td>@(player.Captures!.GroupBy(c => c.FromNumber).Count())</td>
                 <td>@player.Captures!.Count</td>
             </tr>

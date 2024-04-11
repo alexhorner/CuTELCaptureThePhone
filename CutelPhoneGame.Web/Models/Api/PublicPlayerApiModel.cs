@@ -2,14 +2,14 @@
 
 namespace CutelPhoneGame.Web.Models.Api
 {
-    public class ApiPlayerModel
+    public class PublicPlayerApiModel
     {
-        public uint Pin { get; set; }
+        public string Name { get; set; } = null!;
         public string RegisteredFromNumber { get; set; } = null!;
 
-        public static ApiPlayerModel FromModel(PlayerModel model) => new()
+        public static PublicPlayerApiModel FromModel(PlayerModel model) => new()
         {
-            Pin = model.Pin,
+            Name = model.Name,
             RegisteredFromNumber = model.RegisteredFromNumber
         };
     }
