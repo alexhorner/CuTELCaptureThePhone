@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CutelPhoneGame.Web.Controllers
 {
-    public class LeaderboardController(IPlayerProvider playerProvider) : Controller
+    public class LeaderboardController(IConfiguration configuration, IPlayerProvider playerProvider) : Controller
     {
         [HttpGet]
         [AuthenticatedOnly]
@@ -34,7 +34,7 @@ namespace CutelPhoneGame.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Public()
         {
-            (List<PlayerModel> Players, PaginationModel Pagination) paginatedUsers = await playerProvider.GetAllPaginatedAsync(0, 10, true);
+            (List<PlayerModel> Players, PaginationModel Pagination) paginatedUsers = await playerProvider.GetAllPaginatedAsync(0, configuration.GetValue<int>("PublicLeaderboardEntries"), true);
             
             return View(new PublicBasicLeaderboardViewModel
             {

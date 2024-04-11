@@ -82,3 +82,18 @@
         }
     </table>
 </div>
+
+@section Scripts
+{
+    <script>
+        //Render last update time
+        let currentDate = new Date();
+        let currentDateString = currentDate.toDateString();
+        let currentTimeString = currentDate.toLocaleTimeString();
+        
+        document.getElementById("footer-note").innerHTML = '<span class="fw-bold">Last Updated:</span>&nbsp;' + currentDateString + " " + currentTimeString;
+        
+        //Reload page every 10 seconds
+        setTimeout(() => { window.location.reload() }, 10000);
+    </script>
+}
