@@ -12,14 +12,14 @@
 
 <div class="mt-2 mx-4">
     <div class="d-flex justify-content-center my-2">
-        <div class="card mx-1" style="width: 16rem;">
+        <div class="card mx-1">
             <div class="card-body user-select-none text-center">
                 <h5 class="card-title">Most Unique Captures</h5>
                 <p class="card-text fs-3"><span class="badge bg-secondary">@(mostUniqueCapturesPlayer?.Name ?? "None")  <span class="badge bg-white text-dark">@(mostUniqueCapturesPlayer?.Captures!.GroupBy(c => c.FromNumber).Count() ?? 0)</span></span></p>
             </div>
         </div>
         
-        <div class="card mx-1" style="width: 16rem;">
+        <div class="card mx-1">
             <div class="card-body user-select-none text-center">
                 <h5 class="card-title">Most Captures Overall</h5>
                 <p class="card-text fs-3"><span class="badge bg-secondary">@(mostCapturesOverall?.Name ?? "None") <span class="badge bg-white text-dark">@(mostCapturesOverall?.Captures!.Count ?? 0)</span></span></p>
@@ -47,18 +47,34 @@
                 <td>@(player.Captures!.GroupBy(c => c.FromNumber).Count())</td>
                 <td><span class="fw-bold">1hr</span> - @player.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(1)).GroupBy(c => c.FromNumber).Count() / <span class="fw-bold">12h</span> - @(player.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(12)).GroupBy(c => c.FromNumber).Count()) / <span class="fw-bold">24h</span> - @(player.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(24)).GroupBy(c => c.FromNumber).Count())</td>
                 <td>@player.Captures!.Count</td>
-                <td><span class="fw-bold">1hr</span> @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(1)) / <span class="fw-bold">12hr</span> @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(12)) / <span class="fw-bold">24hr</span> @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(24))</td>
+                <td><span class="fw-bold">1hr</span> - @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(1)) / <span class="fw-bold">12hr</span> - @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(12)) / <span class="fw-bold">24hr</span> - @player.Captures!.Count(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(24))</td>
                 <td>
                     @{
-                        CaptureModel firstCapture = player.Captures.OrderBy(c => c.Created).First();
+                        CaptureModel? firstCapture = player.Captures.MinBy(c => c.Created);
+                        
+                        if (firstCapture is null)
+                        {
+                            <span class="text-muted fst-italic">None</span>
+                        }
+                        else
+                        {
+                            @firstCapture.FromNumber <span class="badge bg-secondary">@firstCapture.Created</span>
+                        }
                     }
-                    @firstCapture.FromNumber <span class="badge bg-secondary">@firstCapture.Created</span>
                 </td>
                 <td>
                     @{
-                        CaptureModel latestCapture = player.Captures.OrderBy(c => c.Created).Last();
+                        CaptureModel? latestCapture = player.Captures.MaxBy(c => c.Created);
+
+                        if (latestCapture is null)
+                        {
+                            <span class="text-muted fst-italic">None</span>
+                        }
+                        else
+                        {
+                            @latestCapture.FromNumber <span class="badge bg-secondary">@latestCapture.Created</span>
+                        }
                     }
-                    @latestCapture.FromNumber <span class="badge bg-secondary">@latestCapture.Created</span>
                 </td>
             </tr>
 
