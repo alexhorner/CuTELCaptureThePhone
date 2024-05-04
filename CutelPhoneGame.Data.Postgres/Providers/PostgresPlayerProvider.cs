@@ -50,7 +50,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
             
             IQueryable<Player> playersQuery = db.Players.Include(e => e.Captures);
 
-            playersQuery = orderByLeaderboard ? playersQuery.OrderBy(e => e.Captures!.Count()) : playersQuery.OrderBy(e => e.Pin);
+            playersQuery = orderByLeaderboard ? playersQuery.OrderByDescending(e => e.Captures!.Count()) : playersQuery.OrderBy(e => e.Pin);
                 
             playersQuery = playersQuery.Skip(offset).Take(limit);
             
@@ -72,7 +72,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
 
             if (player is null) return null;
             
-            return db.Players.OrderBy(e => e.Captures!.Count()).Select(e => e.Id).ToList().IndexOf(player.Id);
+            return db.Players.OrderByDescending(e => e.Captures!.Count()).Select(e => e.Id).ToList().IndexOf(player.Id);
         }
 
         public async Task<PlayerModel> CreateAsync(PlayerModel model)

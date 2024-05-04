@@ -3,6 +3,9 @@
     public class CapturedApiModel
     {
         public bool Captured { get; set; }
+        public string NamePartA { get; set; } = null!;
+        public string NamePartB { get; set; } = null!;
+        public string NamePartC { get; set; } = null!;
         public uint? WaitHours { get; set; }
         public uint? WaitMinutes { get; set; }
         public uint? WaitSeconds { get; set; }

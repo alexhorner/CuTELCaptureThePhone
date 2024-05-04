@@ -30,7 +30,7 @@ namespace CutelPhoneGame.Data.Postgres.Providers
 
             int totalNumberListEntries = await db.NumberBlacklist.CountAsync();
             
-            IQueryable<BlacklistEntry> numberListEntriesQuery = db.NumberBlacklist.Skip(offset).Take(limit);
+            IQueryable<BlacklistEntry> numberListEntriesQuery = db.NumberBlacklist.OrderBy(e => e.Id).Skip(offset).Take(limit);
             
             int maxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(totalNumberListEntries) / Convert.ToDouble(limit)) - 1);
             

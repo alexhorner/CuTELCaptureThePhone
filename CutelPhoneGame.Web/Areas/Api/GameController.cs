@@ -103,6 +103,8 @@ namespace CutelPhoneGame.Web.Areas.Api
                 Message = "This pin is invalid"
             });
             
+            string[] nameParts = player.Name.ToLower().Split(' ');
+            
             //See if player has captured this number already within the player timer
             DateTime now = DateTime.UtcNow;
             
@@ -123,12 +125,15 @@ namespace CutelPhoneGame.Web.Areas.Api
                     return Ok(new CapturedApiModel
                     {
                         Captured = false,
+                        NamePartA = nameParts[0],
+                        NamePartB = nameParts[1],
+                        NamePartC = nameParts[2],
                         WaitHours = (uint)Math.Floor(waitHours),
                         WaitMinutes = (uint)waitMinutes,
                         WaitSeconds = (uint)waitSeconds,
                         PlayerTotalCaptures = await captureProvider.GetCountByPlayerIdAsync(player.Id),
                         PlayerUniqueCaptures = await captureProvider.GetUniqueCountByPlayerIdAsync(player.Id),
-                        PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id)
+                        PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id) + 1 //We add 1 as this is the 1 indexed position, even though we store it as 0
                     });
                 }
             }
@@ -151,12 +156,15 @@ namespace CutelPhoneGame.Web.Areas.Api
                     return Ok(new CapturedApiModel
                     {
                         Captured = false,
+                        NamePartA = nameParts[0],
+                        NamePartB = nameParts[1],
+                        NamePartC = nameParts[2],
                         WaitHours = (uint)Math.Floor(waitHours),
                         WaitMinutes = (uint)waitMinutes,
                         WaitSeconds = (uint)waitSeconds,
                         PlayerTotalCaptures = await captureProvider.GetCountByPlayerIdAsync(player.Id),
                         PlayerUniqueCaptures = await captureProvider.GetUniqueCountByPlayerIdAsync(player.Id),
-                        PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id)
+                        PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id) + 1 //We add 1 as this is the 1 indexed position, even though we store it as 0
                     });
                 }
             }
@@ -171,9 +179,15 @@ namespace CutelPhoneGame.Web.Areas.Api
             return Ok(new CapturedApiModel
             {
                 Captured = true,
+                NamePartA = nameParts[0],
+                NamePartB = nameParts[1],
+                NamePartC = nameParts[2],
+                WaitHours = 0,
+                WaitMinutes = 0,
+                WaitSeconds = 0,
                 PlayerTotalCaptures = await captureProvider.GetCountByPlayerIdAsync(player.Id),
                 PlayerUniqueCaptures = await captureProvider.GetUniqueCountByPlayerIdAsync(player.Id),
-                PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id)
+                PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id) + 1 //We add 1 as this is the 1 indexed position, even though we store it as 0
             });
         }
     }
