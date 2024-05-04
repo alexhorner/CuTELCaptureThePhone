@@ -1,5 +1,5 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Publish CutelPhoneGame.Web to folder" type="DotNetFolderPublish" factoryName="Publish to folder">
+  <configuration default="false" name="Publish CutelCaptureThePhone.Web to folder" type="DotNetFolderPublish" factoryName="Publish to folder">
     <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" runtime="Portable" target_folder="bin/Publish/net8.0" target_framework="net8.0" uuid_high="-3427241559834475741" uuid_low="-7911378451994362741" />
     <method v="2" />
   </configuration>

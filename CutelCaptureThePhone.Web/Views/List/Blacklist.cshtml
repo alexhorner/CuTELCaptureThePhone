@@ -1,0 +1,61 @@
+﻿@using CutelCaptureThePhone.Core.Enums
+@using CutelCaptureThePhone.Core.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model BlacklistViewModel
+@{
+    ViewBag.Title = "Number Blacklist";
+}
+
+<div class="container-sm mt-2">
+    <div class="card mb-2">
+        <div class="card-header">
+            Number Blacklist
+        </div>
+
+        <div class="card-body">
+            <div class="w-100 text-center">Numbers which match the Blacklist will be blocked, even if they also match the Whitelist</div>
+            
+            <form method="POST" asp-action="BlacklistCreate">
+                <div class="mb-2">
+                    <label class="form-label" for="createWhitelistEntry-value">Value</label>
+                    <input type="text" class="form-control" name="value" id="createWhitelistEntry-value"/>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label" for="createWhitelistEntry-interpretation">Interpretation</label>
+                    <select class="form-select" id="createWhitelistEntry-interpretation" name="interpretation" asp-items="EnumWebHelper.EnumToSelectList<ValueInterpretation>()"></select>
+                </div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-success mt-2">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+
+    <table class="table table-bordered align-middle">
+        <tr>
+            <th>Value</th>
+            <th>Interpretation</th>
+            <th>Actions</th>
+        </tr>
+        
+        @foreach (BlacklistEntryModel entry in Model.BlacklistEntries)
+        {
+            <tr>
+                <td><input type="text" class="form-control disabled" readonly value="@entry.Value" /></td>
+                <td>@entry.Interpretation.ToString()</td>
+                <td>
+                    <form method="POST" asp-action="BlacklistDelete">
+                        <input type="hidden" name="id" value="@entry.Id" />
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+</div>
