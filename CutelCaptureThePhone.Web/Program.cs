@@ -12,13 +12,27 @@ using CutelCaptureThePhone.Web.Authentication;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSystemd();
 
+//Initialise application configuration
+string persistedDataPath = $"{builder.Environment.ContentRootPath}{Path.DirectorySeparatorChar}PersistedData";
+
+if (!Directory.Exists(persistedDataPath)) Directory.CreateDirectory(persistedDataPath);
+
+string mainConfigurationPath = $"{persistedDataPath}{Path.DirectorySeparatorChar}appsettings.json";
+
+if (!File.Exists(mainConfigurationPath)) File.Copy($"{builder.Environment.ContentRootPath}{Path.DirectorySeparatorChar}appsettings.Default.json", mainConfigurationPath);
+
+builder.Configuration.AddJsonFile(mainConfigurationPath, reloadOnChange: true, optional: false);
+builder.Configuration.AddJsonFile($"{persistedDataPath}{Path.DirectorySeparatorChar}appsettings.{builder.Environment.EnvironmentName}.json", reloadOnChange: true, optional: true);
+
+builder.Configuration.AddEnvironmentVariables();
+
 //Initialise logging
-if (!Directory.Exists("logs")) Directory.CreateDirectory("logs");
+if (!Directory.Exists($"{persistedDataPath}{Path.DirectorySeparatorChar}logs")) Directory.CreateDirectory($"{persistedDataPath}{Path.DirectorySeparatorChar}logs");
 
 LoggerConfiguration logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File($"logs{Path.DirectorySeparatorChar}log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true);
+    .WriteTo.File($"{persistedDataPath}{Path.DirectorySeparatorChar}logs{Path.DirectorySeparatorChar}log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true);
 
 Log.Logger = logger.CreateLogger();
 

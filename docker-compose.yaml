@@ -1,0 +1,22 @@
+#file: noinspection SpellCheckingInspection
+services:
+  capturethephone:
+    image: cutel/capturethephone:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - /var/lib/asterisk/sounds/cutelcapturethephone:/asterisksounds:ro
+      - ./data/capturethephone:/App/PersistedData
+    ports:
+      - 127.0.0.1:5293:5000
+  
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - ./data/db/:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: CutelCaptureThePhone
+      POSTGRES_USER: CutelCaptureThePhone
+      POSTGRES_PASSWORD: change_me_to_match_backend_appsettings
