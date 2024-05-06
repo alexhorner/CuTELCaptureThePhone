@@ -111,6 +111,7 @@
       <_ContentIncludedByDefault Remove="Models\Auth\Register.cshtml" />
       <_ContentIncludedByDefault Remove="Models\Auth\VerifyEmail.cshtml" />
       <_ContentIncludedByDefault Remove="Models\Auth\VerifyForgotPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="PersistedData\appsettings.json" />
     </ItemGroup>
 
     <ItemGroup>

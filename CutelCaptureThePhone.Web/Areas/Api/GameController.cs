@@ -10,7 +10,17 @@ namespace CutelCaptureThePhone.Web.Areas.Api
 {
     [Area("Api")]
     [ApiAuthenticatedOnly]
-    public class GameController(IConfiguration configuration, IBlacklistProvider blacklistProvider, IWhitelistProvider whitelistProvider, IPlayerProvider playerProvider, ICaptureProvider captureProvider, PlayerUniquePinGenerator playerUniquePinGenerator, PlayerUniqueNamesetGenerator playerUniqueNamesetGenerator) : Controller
+    public class GameController
+    (
+        IConfiguration configuration,
+        IBlacklistProvider blacklistProvider,
+        IWhitelistProvider whitelistProvider,
+        IPlayerProvider playerProvider,
+        ICaptureProvider captureProvider,
+        PlayerUniquePinGenerator playerUniquePinGenerator,
+        PlayerUniqueNamesetGenerator playerUniqueNamesetGenerator,
+        CaptureMessageRandomiser captureMessageRandomiser
+    ) : Controller
     {
         [HttpPost]
         public async Task<IActionResult> Register([FromQuery] string fromNumber)
@@ -125,6 +135,7 @@ namespace CutelCaptureThePhone.Web.Areas.Api
                     return Ok(new CapturedApiModel
                     {
                         Captured = false,
+                        SelectedMessage = captureMessageRandomiser.GenerateNewNegative(),
                         NamePartA = nameParts[0],
                         NamePartB = nameParts[1],
                         NamePartC = nameParts[2],
@@ -156,6 +167,7 @@ namespace CutelCaptureThePhone.Web.Areas.Api
                     return Ok(new CapturedApiModel
                     {
                         Captured = false,
+                        SelectedMessage = captureMessageRandomiser.GenerateNewNegative(),
                         NamePartA = nameParts[0],
                         NamePartB = nameParts[1],
                         NamePartC = nameParts[2],
@@ -179,6 +191,7 @@ namespace CutelCaptureThePhone.Web.Areas.Api
             return Ok(new CapturedApiModel
             {
                 Captured = true,
+                SelectedMessage = captureMessageRandomiser.GenerateNewPositive(),
                 NamePartA = nameParts[0],
                 NamePartB = nameParts[1],
                 NamePartC = nameParts[2],

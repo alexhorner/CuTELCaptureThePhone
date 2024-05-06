@@ -75,6 +75,7 @@ builder.Services.AddCutelCaptureThePhonePostgres(builder.Configuration.GetConnec
 
 builder.Services.AddSingleton<PlayerUniquePinGenerator>();
 builder.Services.AddSingleton<PlayerUniqueNamesetGenerator>();
+builder.Services.AddSingleton<CaptureMessageRandomiser>();
 
 //Final initialisation
 WebApplication app = builder.Build();
@@ -184,6 +185,21 @@ using (IServiceScope scope = app.Services.CreateScope())
     
     playerUniqueNamesetGenerator.Configure(namesetParts, usedNamesets);
 }
+
+//Configure capture positive/negative generator
+CaptureMessageRandomiser captureMessageRandomiser = app.Services.GetRequiredService<CaptureMessageRandomiser>();
+    
+List<string> positives = Directory.GetFiles(builder.Configuration.GetValue<string>("CaptureSuccessDirectory")!)
+    .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+    .Order()
+    .ToList();
+    
+List<string> negatives = Directory.GetFiles(builder.Configuration.GetValue<string>("CaptureFailureDirectory")!)
+    .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+    .Order()
+    .ToList();
+    
+captureMessageRandomiser.Configure(positives, negatives);
 
 //Run application
 app.Run();

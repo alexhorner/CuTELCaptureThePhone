@@ -3,6 +3,7 @@
     public class CapturedApiModel
     {
         public bool Captured { get; set; }
+        public string SelectedMessage { get; set; } = null!;
         public string NamePartA { get; set; } = null!;
         public string NamePartB { get; set; } = null!;
         public string NamePartC { get; set; } = null!;
