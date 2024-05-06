@@ -190,12 +190,12 @@ using (IServiceScope scope = app.Services.CreateScope())
 CaptureMessageRandomiser captureMessageRandomiser = app.Services.GetRequiredService<CaptureMessageRandomiser>();
     
 List<string> positives = Directory.GetFiles(builder.Configuration.GetValue<string>("CaptureSuccessDirectory")!)
-    .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+    .Select(f => Path.GetFileName(f).Split('.')[0].ToLower())
     .Order()
     .ToList();
     
 List<string> negatives = Directory.GetFiles(builder.Configuration.GetValue<string>("CaptureFailureDirectory")!)
-    .Select(f => Path.GetFileName(f).Split('.')[0].ToUpperFirstLetter())
+    .Select(f => Path.GetFileName(f).Split('.')[0].ToLower())
     .Order()
     .ToList();
     
