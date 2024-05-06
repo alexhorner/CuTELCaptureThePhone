@@ -22,3 +22,23 @@ footer {
     overflow: hidden;
     background-color: #E7E8E9;
 }
+
+@media only screen and (max-width: 1249px) {
+    .hide-mobile {
+        display: none;
+    }
+
+    .show-mobile {
+        display: block;
+    }
+}
+
+@media only screen and (min-width: 1250px) {
+    .hide-mobile {
+        display: block;
+    }
+
+    .show-mobile {
+        display: none;
+    }
+}

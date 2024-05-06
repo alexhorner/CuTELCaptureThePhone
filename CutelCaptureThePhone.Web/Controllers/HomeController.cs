@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using CutelCaptureThePhone.Web.Authentication.Attributes;
 using CutelCaptureThePhone.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +7,6 @@ namespace CutelCaptureThePhone.Web.Controllers
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
-        [AuthenticatedOnly(suppressMessages: true)]
         public IActionResult Index()
         {
             return View();

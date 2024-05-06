@@ -15,7 +15,7 @@
         <link href="~/style.css" rel="stylesheet" />
         @await RenderSectionAsync("StyleOverrides", required: false)
         
-        <title>@ViewBag.Title - CuTEL Phone Game</title>
+        <title>@ViewBag.Title - CuTEL Capture The Phone</title>
     </head>
     <body>
         <header>
@@ -30,7 +30,7 @@
 
         <footer class="text-muted">
             <div class="float-start">CuTEL &copy; 2022 - @latestYear</div>
-            <div class="float-end" id="footer-note"></div>
+            <div class="float-end hide-mobile" id="footer-note"></div>
         </footer>
         
         <script src="~/dist/bootstrap.bundle.min.js"></script>

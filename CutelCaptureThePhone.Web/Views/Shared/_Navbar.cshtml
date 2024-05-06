@@ -4,7 +4,7 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary user-select-none">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="~/logo.png" alt="CuTEL Logo" height="24" />
+            <img src="~/capturethephone.svg" alt="CuTEL Capture The Phone logo" height="24" />
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
@@ -13,37 +13,50 @@
         
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                 @if (AuthenticationManager.IsLoggedIn && ViewBag.IgnoreNavItems as bool? is null or false)
-                 {
-                     <li class="nav-item">
-                         <form method="POST" asp-controller="Auth" asp-action="Logout">
-                             <button class="nav-link text-danger">Log Out (@AuthenticationManager.CurrentUser!.Username)</button>
-                         </form>
-                     </li>
-                     
-                     <li class="nav-item dropdown">
-                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                             Number Lists
-                         </a>
-                         
-                         <ul class="dropdown-menu">
-                             <li><a class="dropdown-item" asp-controller="List" asp-action="Whitelist">Whitelist</a></li>
-                             <li><a class="dropdown-item" asp-controller="List" asp-action="Blacklist">Blacklist</a></li>
-                         </ul>
-                     </li>
-                     
-                     <li class="nav-item">
-                         <a class="nav-link" asp-controller="Users" asp-action="Index" asp-area="">Users</a>
-                     </li>
-                     
-                     <li class="nav-item">
-                         <a class="nav-link" asp-controller="Players" asp-action="Index" asp-area="">Players</a>
-                     </li>
-                     
-                     <li class="nav-item">
-                         <a class="nav-link" asp-controller="Leaderboard" asp-action="Index" asp-area="">Leaderboard</a>
-                     </li>
-                 }
+                @if (ViewBag.IgnoreNavItems as bool? is null or false)
+                {
+                    if (AuthenticationManager.IsLoggedIn)
+                    {
+                        <li class="nav-item">
+                            <form method="POST" asp-controller="Auth" asp-action="Logout">
+                                <button class="nav-link text-danger">Log Out (@AuthenticationManager.CurrentUser!.Username)</button>
+                            </form>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Number Lists
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="List" asp-action="Whitelist">Whitelist</a></li>
+                                <li><a class="dropdown-item" asp-controller="List" asp-action="Blacklist">Blacklist</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Users" asp-action="Index" asp-area="">Users</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Players" asp-action="Index" asp-area="">Players</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Leaderboard" asp-action="Index" asp-area="">Leaderboard</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Index" asp-area="">Admin Login</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Leaderboard" asp-action="Public" asp-area="">Leaderboard</a>
+                        </li>
+                    }
+                }
             </ul>
         </div>
     </div>
