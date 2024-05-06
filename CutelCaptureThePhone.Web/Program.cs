@@ -18,11 +18,16 @@ string persistedDataPath = $"{builder.Environment.ContentRootPath}{Path.Director
 if (!Directory.Exists(persistedDataPath)) Directory.CreateDirectory(persistedDataPath);
 
 string mainConfigurationPath = $"{persistedDataPath}{Path.DirectorySeparatorChar}appsettings.json";
+string environmentConfigurationPath = $"{persistedDataPath}{Path.DirectorySeparatorChar}appsettings.{builder.Environment.EnvironmentName}.json";
 
+//Copy default configuration into persistent storage
 if (!File.Exists(mainConfigurationPath)) File.Copy($"{builder.Environment.ContentRootPath}{Path.DirectorySeparatorChar}appsettings.Default.json", mainConfigurationPath);
 
+//Copy environment configuration into persistent storage, if it exists
+if (!File.Exists(environmentConfigurationPath) && File.Exists($"{builder.Environment.ContentRootPath}{Path.DirectorySeparatorChar}appsettings.{builder.Environment.EnvironmentName}.json")) File.Copy($"{builder.Environment.ContentRootPath}{Path.DirectorySeparatorChar}appsettings.{builder.Environment.EnvironmentName}.json", environmentConfigurationPath);
+
 builder.Configuration.AddJsonFile(mainConfigurationPath, reloadOnChange: true, optional: false);
-builder.Configuration.AddJsonFile($"{persistedDataPath}{Path.DirectorySeparatorChar}appsettings.{builder.Environment.EnvironmentName}.json", reloadOnChange: true, optional: true);
+builder.Configuration.AddJsonFile(environmentConfigurationPath, reloadOnChange: true, optional: true);
 
 builder.Configuration.AddEnvironmentVariables();
 
