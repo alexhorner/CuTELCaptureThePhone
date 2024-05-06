@@ -9,7 +9,7 @@ services:
       - /var/lib/asterisk/sounds/cutelcapturethephone:/asterisksounds:ro
       - ./data/capturethephone:/App/PersistedData
     ports:
-      - 127.0.0.1:5293:8080
+      - 5293:8080
   
   db:
     image: postgres:latest
