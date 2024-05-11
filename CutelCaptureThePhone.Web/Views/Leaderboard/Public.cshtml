@@ -118,7 +118,7 @@
                             <div class="mb-2">@player.Captures!.Count capture@(player.Captures!.Count == 1 ? "" : "s") across @uniqueCaptureCount unique phone@(uniqueCaptureCount == 1 ? "" : "s")</div>
                             
                             <div>
-                                <span class="fw-bold">First capture:&nbsp;</span>
+                                <span class="fw-bold">First capture:</span>
                                 @{
                                     CaptureModel? firstCapture = player.Captures.MinBy(c => c.Created);
 
@@ -135,7 +135,7 @@
                             </div>
 
                             <div>
-                                <span class="fw-bold">Latest capture:&nbsp;</span>
+                                <span class="fw-bold">Latest capture:</span>
                                 @{
                                     CaptureModel? latestCapture = player.Captures.MaxBy(c => c.Created);
 
