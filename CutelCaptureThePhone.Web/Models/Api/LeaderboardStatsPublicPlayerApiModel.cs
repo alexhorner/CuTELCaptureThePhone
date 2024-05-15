@@ -7,11 +7,11 @@ namespace CutelCaptureThePhone.Web.Models.Api
         public uint Position { get; set; }
         public int UniqueCaptures { get; set; }
         public int TotalCaptures { get; set; }
-        public string FirstCapture { get; set; } = null!;
-        public string LatestCapture { get; set; } = null!;
+        public string? FirstCapture { get; set; }
+        public string? LatestCapture { get; set; }
         public LeaderboardPlayerPeriodsApiModel Periods { get; set; } = null!;
         
-        public static LeaderboardStatsPublicPlayerApiModel FromModel(PlayerModel model, uint position, int uniqueCaptures, int totalCaptures, string firstCapture, string latestCapture, LeaderboardPlayerPeriodsApiModel periods) => new()
+        public static LeaderboardStatsPublicPlayerApiModel FromModel(PlayerModel model, uint position, int uniqueCaptures, int totalCaptures, string? firstCapture, string? latestCapture, LeaderboardPlayerPeriodsApiModel periods) => new()
         {
             Name = model.Name,
             RegisteredFromNumber = model.RegisteredFromNumber,

@@ -25,10 +25,10 @@ namespace CutelCaptureThePhone.Web.Areas.Api
                 {
                     int uniqueCaptures = p.Captures!.GroupBy(c => c.FromNumber).Count();
                     
-                    CaptureModel firstCapture = p.Captures!.OrderBy(c => c.Created).First();
-                    CaptureModel latestCapture = p.Captures!.OrderBy(c => c.Created).Last();
+                    CaptureModel? firstCapture = p.Captures!.MinBy(c => c.Created);
+                    CaptureModel? latestCapture = p.Captures!.MaxBy(c => c.Created);
                     
-                    return LeaderboardStatsPublicPlayerApiModel.FromModel(p, count++, uniqueCaptures, p.Captures!.Count, firstCapture.FromNumber, latestCapture.FromNumber, new LeaderboardPlayerPeriodsApiModel
+                    return LeaderboardStatsPublicPlayerApiModel.FromModel(p, count++, uniqueCaptures, p.Captures!.Count, firstCapture?.FromNumber, latestCapture?.FromNumber, new LeaderboardPlayerPeriodsApiModel
                     {
                         UniqueCapturesWithin1Hour = p.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(1)).GroupBy(c => c.FromNumber).Count(),
                         UniqueCapturesWithin12Hours = p.Captures!.Where(c => c.Created > DateTime.UtcNow - TimeSpan.FromHours(12)).GroupBy(c => c.FromNumber).Count(),
