@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace CutelCaptureThePhone.Web.Areas.Api
 {
     [Area("Api")]
-    [ApiAuthenticatedOnly]
     public class GameController
     (
         IConfiguration configuration,
@@ -17,16 +16,18 @@ namespace CutelCaptureThePhone.Web.Areas.Api
         IWhitelistProvider whitelistProvider,
         IPlayerProvider playerProvider,
         ICaptureProvider captureProvider,
+        IMapPinProvider mapPinProvider,
         PlayerUniquePinGenerator playerUniquePinGenerator,
         PlayerUniqueNamesetGenerator playerUniqueNamesetGenerator,
         CaptureMessageRandomiser captureMessageRandomiser
     ) : Controller
     {
         [HttpPost]
+        [ApiAuthenticatedOnly]
         public async Task<IActionResult> Register([FromQuery] string fromNumber)
         {
             //Validate from number
-            if (!Regex.IsMatch(fromNumber, "[0-9]+") || blacklistProvider.MatchesNumberAsync(fromNumber) || !whitelistProvider.MatchesNumberAsync(fromNumber)) return Unauthorized(new SimpleResponseModel
+            if (!Regex.IsMatch(fromNumber, "[0-9]+") || blacklistProvider.MatchesNumberAsync(fromNumber) || !await whitelistProvider.MatchesNumberAsync(fromNumber)) return Unauthorized(new SimpleResponseModel
             {
                 Message = "This number is not allowed to be used in the game"
             });
@@ -97,10 +98,11 @@ namespace CutelCaptureThePhone.Web.Areas.Api
         }
 
         [HttpPost]
+        [ApiAuthenticatedOnly]
         public async Task<IActionResult> Capture([FromQuery] string fromNumber, [FromQuery] uint pin)
         {
             //Validate from number
-            if (!Regex.IsMatch(fromNumber, "[0-9]+") || blacklistProvider.MatchesNumberAsync(fromNumber) || !whitelistProvider.MatchesNumberAsync(fromNumber)) return Unauthorized(new SimpleResponseModel
+            if (!Regex.IsMatch(fromNumber, "[0-9]+") || blacklistProvider.MatchesNumberAsync(fromNumber) || !await whitelistProvider.MatchesNumberAsync(fromNumber)) return Unauthorized(new SimpleResponseModel
             {
                 Message = "This number is not allowed to be used in the game"
             });
@@ -202,6 +204,31 @@ namespace CutelCaptureThePhone.Web.Areas.Api
                 PlayerUniqueCaptures = await captureProvider.GetUniqueCountByPlayerIdAsync(player.Id),
                 PlayerLeaderboardPosition = await playerProvider.GetLeaderboardPositionAsync(player.Id) + 1 //We add 1 as this is the 1 indexed position, even though we store it as 0
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MapPins()
+        {
+            List<MapPinModel> pins = await mapPinProvider.GetAllAsync();
+
+            List<MapPinApiModel> pinApiModels = [];
+            
+            foreach (MapPinModel pin in pins)
+            {
+                pinApiModels.Add(new MapPinApiModel
+                {
+                    Lat = pin.Lat,
+                    Long = pin.Long,
+                    Name = pin.Name,
+                    Number = pin.Number,
+                    TotalCaptures = await captureProvider.GetCountByNumberAsync(pin.Number),
+                    UniquePlayers = await captureProvider.GetUniqueCountByNumberAsync(pin.Number),
+                    FirstCapturingPlayer = (await captureProvider.GetFirstCapturingPlayerByNumberAsync(pin.Number))?.Name,
+                    LatestCapturingPlayer = (await captureProvider.GetLatestCapturingPlayerByNumberAsync(pin.Number))?.Name
+                });
+            }
+
+            return Json(pinApiModels);
         }
     }
 }

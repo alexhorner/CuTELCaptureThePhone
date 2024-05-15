@@ -17,7 +17,8 @@ namespace CutelCaptureThePhone.Data.Postgres
         public virtual DbSet<Capture> Captures { get; set; } = null!;
         public virtual DbSet<BlacklistEntry> NumberBlacklist { get; set; } = null!;
         public virtual DbSet<WhitelistEntry> NumberWhitelist { get; set; } = null!;
-        
+        public virtual DbSet<MapPin> MapPins { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasPostgresExtension("citext");
@@ -27,6 +28,7 @@ namespace CutelCaptureThePhone.Data.Postgres
             builder.ApplyConfiguration(new CaptureEntityConfiguration());
             builder.ApplyConfiguration(new BlacklistEntryEntityConfiguration());
             builder.ApplyConfiguration(new WhitelistEntryEntityConfiguration());
+            builder.ApplyConfiguration(new MapPinEntityConfiguration());
 
             base.OnModelCreating(builder);
         }

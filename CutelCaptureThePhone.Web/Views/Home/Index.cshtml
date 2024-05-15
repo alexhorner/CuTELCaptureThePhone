@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Home";
+    ViewBag.EnableLeaflet = true;
 }
 
 <div class="w-100 text-center hide-mobile">
@@ -25,4 +26,55 @@
         All phones have a cooldown, in which only one player may capture it. If someone in front of you just captured the phone, you'll need to wait for the phone to cool down before your turn. Additionally, each phone has a player cooldown too,
         where you can only capture each phone once per day, so make sure to go and capture as many unique phones as you can!
     </p>
+    
+    <div id="map" style="height: 50rem;"></div>
 </div>
+
+<partial name="_PinPopupTemplate" />
+
+@section Scripts
+{
+    <script src="~/dist/emfcamp/emfmap.js"></script>
+
+    <script>
+        let popupContentTemplate = document.getElementById("pinPopupTemplate");
+        let popupScratchSpace = document.getElementById("popupScratchSpace");
+        
+        let map = L.map('map').setView([52.0411, -2.3784], 17);
+
+        let gl = L.maplibreGL({
+            style: emfMapStyle
+        }).addTo(map);
+        
+        let pinIcon = L.icon({
+            iconUrl: "/capturethephone-pin.svg", 
+            iconSize: [50, 50],
+            iconAnchor: [25, 50]
+        });
+
+        fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
+            data.forEach(pin => {
+                let pinMarker = L.marker([pin.lat, pin.long], {
+                    icon: pinIcon
+                }).addTo(map);
+
+                let popupContent = popupContentTemplate.content.cloneNode(true);
+
+                popupContent.querySelector('[data-sel="name"]').innerText = pin.name;
+                popupContent.querySelector('[data-sel="number"]').innerText = pin.number;
+
+                popupContent.querySelector('[data-sel="uniquePlayers"]').innerText = pin.uniquePlayers + " player" + (pin.uniquePlayers === 1 ? "" : "s");
+                popupContent.querySelector('[data-sel="totalCaptures"]').innerText = pin.totalCaptures;
+
+                popupContent.querySelector('[data-sel="firstCapture"]').innerText = pin.firstCapturingPlayer === null ? "None" : pin.firstCapturingPlayer;
+                popupContent.querySelector('[data-sel="latestCapture"]').innerText = pin.latestCapturingPlayer === null ? "None" : pin.latestCapturingPlayer;
+
+                popupScratchSpace.innerHTML = null;
+                popupScratchSpace.appendChild(popupContent);
+
+                pinMarker.bindPopup(popupScratchSpace.innerHTML);
+            });
+        });
+    
+    </script>
+}

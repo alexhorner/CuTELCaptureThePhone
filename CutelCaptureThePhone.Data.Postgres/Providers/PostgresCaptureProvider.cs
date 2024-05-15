@@ -41,6 +41,8 @@ namespace CutelCaptureThePhone.Data.Postgres.Providers
         public Task<int> GetCountAsync() => db.Captures.CountAsync();
 
         public Task<int> GetCountByPlayerIdAsync(uint playerId) => db.Captures.CountAsync(e => e.PlayerId == playerId);
+        
+        public Task<int> GetCountByNumberAsync(string fromNumber) => db.Captures.CountAsync(e => e.FromNumber == fromNumber);
 
         public Task<int> GetCountByPlayerIdAndNumberAsync(uint playerId, string fromNumber) => db.Captures.CountAsync(e => e.PlayerId == playerId && e.FromNumber == fromNumber);
 
@@ -51,6 +53,22 @@ namespace CutelCaptureThePhone.Data.Postgres.Providers
         public Task<int> GetScoreByPlayerIdAndNumberAsync(uint playerId, string fromNumber) => GetCountByPlayerIdAndNumberAsync(playerId, fromNumber);
         
         public Task<int> GetUniqueCountByPlayerIdAsync(uint playerId) => db.Captures.Where(e => e.PlayerId == playerId).GroupBy(e => e.FromNumber).CountAsync();
+        
+        public Task<int> GetUniqueCountByNumberAsync(string fromNumber) => db.Captures.Where(e => e.FromNumber == fromNumber).GroupBy(e => e.PlayerId).CountAsync();
+
+        public async Task<PlayerModel?> GetFirstCapturingPlayerByNumberAsync(string fromNumber)
+        {
+            Player? player = await db.Captures.Where(e => e.FromNumber == fromNumber).OrderBy(e => e.Created).Select(e => e.Player).FirstOrDefaultAsync();
+
+            return player?.ToModel();
+        }
+
+        public async Task<PlayerModel?> GetLatestCapturingPlayerByNumberAsync(string fromNumber)
+        {
+            Player? player = await db.Captures.Where(e => e.FromNumber == fromNumber).OrderByDescending(e => e.Created).Select(e => e.Player).FirstOrDefaultAsync();
+
+            return player?.ToModel();
+        }
 
         public Task<List<CaptureModel>> GetAllAsync() => db.Captures.OrderBy(e => e.Created).Select(e => e.ToModel(true)).ToListAsync();
 

@@ -11,10 +11,14 @@ namespace CutelCaptureThePhone.Core.Providers
         Task<CaptureModel?> GetLatestByPlayerIdAndNumberAsync(uint playerId, string fromNumber);
         Task<int> GetCountAsync();
         Task<int> GetCountByPlayerIdAsync(uint playerId);
+        Task<int> GetCountByNumberAsync(string fromNumber);
         Task<int> GetCountByPlayerIdAndNumberAsync(uint playerId, string fromNumber);
         Task<int> GetScoreByPlayerIdAsync(uint playerId);
         Task<int> GetScoreByPlayerIdAndNumberAsync(uint playerId, string fromNumber);
         Task<int> GetUniqueCountByPlayerIdAsync(uint playerId);
+        Task<int> GetUniqueCountByNumberAsync(string fromNumber);
+        Task<PlayerModel?> GetFirstCapturingPlayerByNumberAsync(string fromNumber);
+        Task<PlayerModel?> GetLatestCapturingPlayerByNumberAsync(string fromNumber);
         Task<List<CaptureModel>> GetAllAsync();
         Task<List<CaptureModel>> GetAllByPlayerIdAsync(uint playerId);
         Task<List<CaptureModel>> GetAllByPlayerIdAndNumberAsync(uint playerId, string fromNumber);

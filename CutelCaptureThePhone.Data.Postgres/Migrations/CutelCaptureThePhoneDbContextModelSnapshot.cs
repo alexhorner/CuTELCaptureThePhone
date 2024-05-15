@@ -77,6 +77,42 @@ namespace CutelCaptureThePhone.Data.Postgres.Migrations
                     b.ToTable("Captures");
                 });
 
+            modelBuilder.Entity("CutelCaptureThePhone.Data.Postgres.Entities.MapPin", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Lat")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Long")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.ToTable("MapPins");
+                });
+
             modelBuilder.Entity("CutelCaptureThePhone.Data.Postgres.Entities.Player", b =>
                 {
                     b.Property<long>("Id")

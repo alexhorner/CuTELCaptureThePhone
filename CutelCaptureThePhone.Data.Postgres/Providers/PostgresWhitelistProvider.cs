@@ -44,8 +44,10 @@ namespace CutelCaptureThePhone.Data.Postgres.Providers
             });
         }
 
-        public bool MatchesNumberAsync(string number)
+        public async Task<bool> MatchesNumberAsync(string number)
         {
+            if (await db.MapPins.AnyAsync(e => e.Number == number)) return true;
+            
             bool matches = false;
             
             foreach (WhitelistEntry entry in db.NumberWhitelist)

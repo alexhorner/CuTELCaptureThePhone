@@ -19,7 +19,8 @@ namespace CutelCaptureThePhone.Data.Postgres
                 .AddScoped<IPlayerProvider, PostgresPlayerProvider>()
                 .AddScoped<ICaptureProvider, PostgresCaptureProvider>()
                 .AddScoped<IBlacklistProvider, PostgresBlacklistProvider>()
-                .AddScoped<IWhitelistProvider, PostgresWhitelistProvider>();
+                .AddScoped<IWhitelistProvider, PostgresWhitelistProvider>()
+                .AddScoped<IMapPinProvider, PostgresMapPinProvider>();
 
             return services;
         }

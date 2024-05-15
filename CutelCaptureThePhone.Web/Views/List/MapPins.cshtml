@@ -1,0 +1,147 @@
+﻿@using CutelCaptureThePhone.Core.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model MapPinsViewModel
+@{
+    ViewBag.Title = "Map Pins";
+    ViewBag.EnableLeaflet = true;
+}
+
+<div class="container-sm mt-2">
+    <div class="card mb-2">
+        <div class="card-header">
+            Map Pins
+        </div>
+
+        <div class="card-body">
+            <div class="w-100 text-center">Numbers defined here will be added as Exact values to the Whitelist implicitly, but can still be blocked by the Blacklist</div>
+            
+            <form method="POST" asp-action="MapPinCreate">
+                <div class="mb-2">
+                    <label class="form-label" for="createMapPin-name">Name</label>
+                    <input type="text" class="form-control" name="name" id="createMapPin-name"/>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label" for="createMapPin-number">Number</label>
+                    <input type="text" class="form-control" name="number" id="createMapPin-number"/>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label" for="createMapPin-coordinates">Coordinates</label>
+
+                    <div class="input-group" id="createMapPin-coordinates">
+                        <input type="text" class="form-control" placeholder="Latitude" name="latitude" id="createMapPin-latitude">
+                        <input type="text" class="form-control" placeholder="Longitude" name="longitude" id="createMapPin-longitude">
+                    </div>
+                </div>
+
+                <div class="w-100 text-center mb-2">Move the blue pin on the map below to automatically fill in the latitude and longitude values</div>
+
+                <div id="map" style="height: 50rem;"></div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-success mt-2">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+
+    <table class="table table-bordered align-middle">
+        <tr>
+            <th>Name</th>
+            <th>Number</th>
+            <th>Coordinates</th>
+            <th>Actions</th>
+        </tr>
+        
+        @foreach (MapPinModel pin in Model.MapPins)
+        {
+            <tr>
+                <td>@pin.Name</td>
+                <td>@pin.Number</td>
+                <td>@(pin.Lat),&nbsp;@pin.Long</td>
+                <td>
+                    <form method="POST" asp-action="MapPinDelete">
+                        <input type="hidden" name="id" value="@pin.Id" />
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    
+    <partial name="_Paginator" model="@Model.Pagination" />
+</div>
+
+<partial name="_PinPopupTemplate" />
+
+@section Scripts
+{
+    <script src="~/dist/emfcamp/emfmap.js"></script>
+
+    <script>
+        let latitudeField = document.getElementById("createMapPin-latitude");
+        let longitudeField = document.getElementById("createMapPin-longitude");
+        let popupContentTemplate = document.getElementById("pinPopupTemplate");
+        let popupScratchSpace = document.getElementById("popupScratchSpace");
+        
+        let map = L.map('map').setView([52.0411, -2.3784], 17);
+
+        let gl = L.maplibreGL({
+            style: emfMapStyle
+        }).addTo(map);
+
+        let pinIcon = L.icon({
+            iconUrl: "/capturethephone-pin.svg",
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+
+        fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
+            data.forEach(pin => {
+                let pinMarker = L.marker([pin.lat, pin.long], {
+                    icon: pinIcon
+                }).addTo(map);
+
+                let popupContent = popupContentTemplate.content.cloneNode(true);
+                
+                popupContent.querySelector('[data-sel="name"]').innerText = pin.name;
+                popupContent.querySelector('[data-sel="number"]').innerText = pin.number;
+                
+                popupContent.querySelector('[data-sel="uniquePlayers"]').innerText = pin.uniquePlayers + " player" + (pin.uniquePlayers === 1 ? "" : "s");
+                popupContent.querySelector('[data-sel="totalCaptures"]').innerText = pin.totalCaptures;
+                
+                popupContent.querySelector('[data-sel="firstCapture"]').innerText = pin.firstCapturingPlayer === null ? "None" : pin.firstCapturingPlayer;
+                popupContent.querySelector('[data-sel="latestCapture"]').innerText = pin.latestCapturingPlayer === null ? "None" : pin.latestCapturingPlayer;
+
+                popupScratchSpace.innerHTML = null;
+                popupScratchSpace.appendChild(popupContent);
+
+                pinMarker.bindPopup(popupScratchSpace.innerHTML);
+            });
+        });
+
+        let draggableMarker = L.marker([0, 0], {
+            draggable: true,
+            autoPan: true
+        }).addTo(map); //Default to 0,0 so when we set below, it automatically triggers the event which updates the form fields
+        
+        draggableMarker.addEventListener("move", (e) => {
+            latitudeField.value = e.latlng.lat;
+            longitudeField.value = e.latlng.lng;
+        });
+
+        latitudeField.addEventListener("change", () => {
+            draggableMarker.setLatLng([latitudeField.value, longitudeField.value]);
+        });
+
+        longitudeField.addEventListener("change", () => {
+            draggableMarker.setLatLng([latitudeField.value, longitudeField.value]);
+        });
+
+        draggableMarker.setLatLng([52.0411, -2.3784]);
+    </script>
+}

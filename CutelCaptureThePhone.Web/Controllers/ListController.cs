@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CutelCaptureThePhone.Web.Controllers
 {
     [AuthenticatedOnly]
-    public class ListController(ILogger<ListController> logger, IWhitelistProvider whitelistProvider, IBlacklistProvider blacklistProvider) : Controller
+    public class ListController(ILogger<ListController> logger, IWhitelistProvider whitelistProvider, IBlacklistProvider blacklistProvider, IMapPinProvider mapPinProvider) : Controller
     {
         [HttpGet]
         public async Task<IActionResult> Whitelist([FromQuery] int? page)
@@ -195,6 +195,107 @@ namespace CutelCaptureThePhone.Web.Controllers
 
             TempData["Message"] = "The entry has been successfully deleted";
             return RedirectToAction("Blacklist");
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> MapPins([FromQuery] int? page)
+        {
+            page ??= 0;
+            
+            if (page < 0) page = 0;
+
+            (List<MapPinModel> Pins, PaginationModel Pagination) paginatedWhitelist = await mapPinProvider.GetAllPaginatedAsync(page.Value);
+            
+            return View(new MapPinsViewModel
+            {
+                MapPins = paginatedWhitelist.Pins,
+                Pagination = new PaginatorPartialViewModel
+                {
+                    CurrentPage = paginatedWhitelist.Pagination.CurrentPage,
+                    MaxPage = paginatedWhitelist.Pagination.MaxPage,
+                    PageSwitchController = nameof(ListController),
+                    PageSwitchAction = nameof(MapPins)
+                }
+            });
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> MapPinCreate([FromForm] string name, [FromForm] string number, [FromForm] decimal latitude, [FromForm] decimal longitude)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "No name was provided";
+                return RedirectToAction("MapPins");
+            }
+            
+            if (string.IsNullOrWhiteSpace(number))
+            {
+                TempData["Error"] = "No number was provided";
+                return RedirectToAction("MapPins");
+            }
+
+            if (latitude == 0 && longitude == 0)
+            {
+                TempData["Error"] = "The provided latitude and longitude pointed to null island";
+                return RedirectToAction("MapPins");
+            }
+
+            try
+            {
+                await mapPinProvider.CreateAsync(new MapPinModel
+                {
+                    Name = name,
+                    Number = number,
+                    Lat = latitude,
+                    Long = longitude
+                });
+            }
+            catch (DuplicateNameException)
+            {
+                TempData["Error"] = "A map pin with this number already exists";
+                return RedirectToAction("MapPins");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Failed to create a new map pin with name '{name}' and number {number} at lat/long {latitude}/{longitude}");
+                
+                TempData["Error"] = "An error occured creating the map pin. Please try again";
+                return RedirectToAction("MapPins");
+            }
+
+            TempData["Message"] = "The map pin has been successfully created";
+            return RedirectToAction("MapPins");
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> MapPinDelete([FromForm] uint? id)
+        {
+            if (id is null or 0)
+            {
+                TempData["Error"] = "No pin was provided";
+                return RedirectToAction("MapPins");
+            }
+            
+            if (!await mapPinProvider.ExistsByIdAsync(id.Value))
+            {
+                TempData["Error"] = "The specified map pin doesn't exist";
+                return RedirectToAction("MapPins");
+            }
+            
+            try
+            {
+                await mapPinProvider.DeleteAsync(id.Value);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Failed to delete a map pin with id '{id}'");
+                
+                TempData["Error"] = "An error occured deleting the map pin. Please try again";
+                return RedirectToAction("MapPins");
+            }
+
+            TempData["Message"] = "The map pin has been successfully deleted";
+            return RedirectToAction("MapPins");
         }
     }
 }
