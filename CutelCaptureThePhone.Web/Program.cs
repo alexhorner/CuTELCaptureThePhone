@@ -8,6 +8,7 @@ using Serilog;
 using CutelCaptureThePhone.Data.Postgres;
 using CutelCaptureThePhone.Web.Authentication;
 using CutelCaptureThePhone.Web.Bruteforce;
+using Microsoft.AspNetCore.HttpOverrides;
 
 //Initialise application builder
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,11 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
 //Session & Cookies
 builder.Services
     .AddDistributedMemoryCache()
@@ -89,6 +95,7 @@ WebApplication app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
+    app.UseForwardedHeaders();
     app.UseExceptionHandler("/Home/Error");
     
     //The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
