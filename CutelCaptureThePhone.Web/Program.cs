@@ -7,6 +7,7 @@ using Npgsql;
 using Serilog;
 using CutelCaptureThePhone.Data.Postgres;
 using CutelCaptureThePhone.Web.Authentication;
+using CutelCaptureThePhone.Web.Bruteforce;
 
 //Initialise application builder
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -81,6 +82,7 @@ builder.Services.AddCutelCaptureThePhonePostgres(builder.Configuration.GetConnec
 builder.Services.AddSingleton<PlayerUniquePinGenerator>();
 builder.Services.AddSingleton<PlayerUniqueNamesetGenerator>();
 builder.Services.AddSingleton<CaptureMessageRandomiser>();
+builder.Services.AddSingleton<AntiBruteforceStore>();
 
 //Final initialisation
 WebApplication app = builder.Build();

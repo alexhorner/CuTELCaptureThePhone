@@ -5,12 +5,13 @@ using CutelCaptureThePhone.Web.Models;
 using CutelCaptureThePhone.Core.Extensions;
 using CutelCaptureThePhone.Core.Models;
 using CutelCaptureThePhone.Core.Providers;
+using CutelCaptureThePhone.Web.Bruteforce;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CutelCaptureThePhone.Web.Controllers
 {
     [AutoValidateAntiforgeryToken]
-    public class AuthController(ILogger<AuthController> logger, IAuthenticationManager authenticationManager, IUserProvider userProvider) : Controller
+    public class AuthController(ILogger<AuthController> logger, IAuthenticationManager authenticationManager, IUserProvider userProvider, AntiBruteforceStore antiBruteforceStore) : Controller
     {
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] string? returnUrl)
@@ -45,6 +46,13 @@ namespace CutelCaptureThePhone.Web.Controllers
             
             if (!authenticationManager.IsLoggedIn)
             {
+                if (antiBruteforceStore.IsBlocked(HttpContext.Connection.RemoteIpAddress!.ToString()))
+                {
+                    TempData["Error"] = "Your username or password was incorrect";
+                    logger.LogInformation($"Blocked login attempt from {HttpContext.Connection.RemoteIpAddress!.ToString()} due to bruteforce blocking");
+                    return RedirectToAction("Index", new { ReturnUrl = returnUrl });
+                }
+                
                 try
                 {
                     if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password)) throw new UsernameOrPasswordIncorrectException();
@@ -63,6 +71,10 @@ namespace CutelCaptureThePhone.Web.Controllers
                 catch (UsernameOrPasswordIncorrectException)
                 {
                     TempData["Error"] = "Your username or password was incorrect";
+                    
+                    antiBruteforceStore.LogFailedAttempt(HttpContext.Connection.RemoteIpAddress!.ToString());
+                    logger.LogInformation($"Logged failed login attempt for {HttpContext.Connection.RemoteIpAddress!.ToString()}");
+                    
                     return RedirectToAction("Index", new { ReturnUrl = returnUrl });
                 }
                 catch (Exception e)
