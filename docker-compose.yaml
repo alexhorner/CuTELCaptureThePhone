@@ -19,6 +19,8 @@ services:
   traefik:
     image: traefik:v3.0
     restart: unless-stopped
+    depends_on:
+      - capturethephone
     command:
       - "--log.level=DEBUG"
       - "--api.insecure=false"
