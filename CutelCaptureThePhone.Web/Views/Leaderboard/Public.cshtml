@@ -1,5 +1,7 @@
 ﻿@using CutelCaptureThePhone.Core.Models
+@using CutelCaptureThePhone.Core.Providers
 @model PublicBasicLeaderboardViewModel
+@inject IMapPinProvider MapPinProvider
 @{
     ViewBag.Title = "Public Basic Leaderboard";
     ViewBag.IgnoreNavItems = true;
@@ -59,7 +61,9 @@
                             }
                             else
                             {
-                                @firstCapture.FromNumber
+                                MapPinModel? mapPinByNumber = await MapPinProvider.GetByNumberAsync(firstCapture.FromNumber);
+                                        
+                                @(mapPinByNumber is not null ? mapPinByNumber.Name : firstCapture.FromNumber)
                                 <span class="badge bg-secondary">@firstCapture.Created</span>
                             }
                         }
@@ -74,7 +78,9 @@
                             }
                             else
                             {
-                                @latestCapture.FromNumber
+                                MapPinModel? mapPinByNumber = await MapPinProvider.GetByNumberAsync(latestCapture.FromNumber);
+                                        
+                                @(mapPinByNumber is not null ? mapPinByNumber.Name : latestCapture.FromNumber)
                                 <span class="badge bg-secondary">@latestCapture.Created</span>
                             }
                         }
@@ -128,7 +134,9 @@
                                     }
                                     else
                                     {
-                                        @firstCapture.FromNumber
+                                        MapPinModel? mapPinByNumber = await MapPinProvider.GetByNumberAsync(firstCapture.FromNumber);
+                                        
+                                        @(mapPinByNumber is not null ? mapPinByNumber.Name : firstCapture.FromNumber)
                                         <span class="badge bg-secondary">@firstCapture.Created</span>
                                     }
                                 }
@@ -145,7 +153,9 @@
                                     }
                                     else
                                     {
-                                        @latestCapture.FromNumber
+                                        MapPinModel? mapPinByNumber = await MapPinProvider.GetByNumberAsync(latestCapture.FromNumber);
+                                        
+                                        @(mapPinByNumber is not null ? mapPinByNumber.Name : latestCapture.FromNumber)
                                         <span class="badge bg-secondary">@latestCapture.Created</span>
                                     }
                                 }

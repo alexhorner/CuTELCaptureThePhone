@@ -3,6 +3,7 @@ using CutelCaptureThePhone.Core;
 using CutelCaptureThePhone.Core.Models;
 using CutelCaptureThePhone.Core.Providers;
 using CutelCaptureThePhone.Web.ApiAuthentication.Attributes;
+using CutelCaptureThePhone.Web.Authentication;
 using CutelCaptureThePhone.Web.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,7 @@ namespace CutelCaptureThePhone.Web.Areas.Api
     public class GameController
     (
         IConfiguration configuration,
+        IAuthenticationManager authenticationManager,
         IBlacklistProvider blacklistProvider,
         IWhitelistProvider whitelistProvider,
         IPlayerProvider playerProvider,
@@ -220,7 +222,7 @@ namespace CutelCaptureThePhone.Web.Areas.Api
                     Lat = pin.Lat,
                     Long = pin.Long,
                     Name = pin.Name,
-                    Number = pin.Number,
+                    Number = authenticationManager.IsLoggedIn ? pin.Number : null, //Only show numbers on pins if logged in on the admin frontend
                     TotalCaptures = await captureProvider.GetCountByNumberAsync(pin.Number),
                     UniquePlayers = await captureProvider.GetUniqueCountByNumberAsync(pin.Number),
                     FirstCapturingPlayer = (await captureProvider.GetFirstCapturingPlayerByNumberAsync(pin.Number))?.Name,

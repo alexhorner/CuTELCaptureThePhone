@@ -28,6 +28,7 @@
     </p>
     
     <div id="map" style="height: 50rem;"></div>
+    <div class="w-100 text-center my-1">Follow the map above to locate phones. Click a pin to view the phone name and its stats</div>
 </div>
 
 <partial name="_PinPopupTemplate" />
@@ -45,11 +46,12 @@
         let gl = L.maplibreGL({
             style: emfMapStyle
         }).addTo(map);
-        
+
         let pinIcon = L.icon({
-            iconUrl: "/capturethephone-pin.svg", 
+            iconUrl: "/capturethephone-pin.svg",
             iconSize: [50, 50],
-            iconAnchor: [25, 50]
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
         });
 
         fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
