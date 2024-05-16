@@ -17,10 +17,19 @@
                 {
                     if (AuthenticationManager.IsLoggedIn)
                     {
-                        <li class="nav-item">
-                            <form method="POST" asp-controller="Auth" asp-action="Logout">
-                                <button class="nav-link text-danger">Log Out (@AuthenticationManager.CurrentUser!.Username)</button>
-                            </form>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                My Account (@AuthenticationManager.CurrentUser!.Username)
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="ChangePassword">Change Password</a></li>
+                                <li>
+                                    <form method="POST" asp-controller="Auth" asp-action="Logout">
+                                        <button class="dropdown-item text-danger">Log Out</button>
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-item dropdown">

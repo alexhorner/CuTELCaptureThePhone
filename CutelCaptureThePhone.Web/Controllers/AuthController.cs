@@ -101,6 +101,60 @@ namespace CutelCaptureThePhone.Web.Controllers
         }
 
         [HttpGet]
+        [AuthenticatedOnly]
+        public IActionResult ChangePassword() => View();
+
+        [HttpPost]
+        [ActionName(nameof(ChangePassword))]
+        public async Task<IActionResult> ChangePasswordPost([FromForm] string oldPassword, [FromForm] string newPassword, [FromForm] string confirmNewPassword)
+        {
+            if (string.IsNullOrWhiteSpace(oldPassword))
+            {
+                TempData["Error"] = "No old password was provided";
+                return RedirectToAction("ChangePassword");
+            }
+            
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                TempData["Error"] = "No new password was provided";
+                return RedirectToAction("ChangePassword");
+            }
+            
+            if (string.IsNullOrWhiteSpace(confirmNewPassword))
+            {
+                TempData["Error"] = "No confirmation password was provided";
+                return RedirectToAction("ChangePassword");
+            }
+
+            if (newPassword != confirmNewPassword)
+            {
+                TempData["Error"] = "The new and confirmation passwords do not match";
+                return RedirectToAction("ChangePassword");
+            }
+
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(oldPassword, authenticationManager.CurrentUser!.HashedPassword))
+            {
+                TempData["Error"] = "Your old password is incorrect";
+                return RedirectToAction("ChangePassword");
+            }
+            
+            try
+            {
+                await authenticationManager.ChangePasswordAsync(newPassword);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, $"Failed to update password for user {authenticationManager.CurrentUser!.Id}");
+                
+                TempData["Error"] = "An error occured updating your password. Please try again";
+                return RedirectToAction("ChangePassword");
+            }
+
+            TempData["Message"] = "Your password has successfully been updated";
+            return RedirectToAction("ChangePassword");
+        }
+        
+        [HttpGet]
         public IActionResult NotAuthorised([FromQuery] string? returnUrl, [FromQuery] bool suppressMessages)
         {
             if (!suppressMessages) TempData["Warning"] = "You do not have permission to view this page";
