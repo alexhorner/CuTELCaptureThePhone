@@ -8,9 +8,36 @@ services:
     volumes:
       - /var/lib/asterisk/sounds/cutelcapturethephone:/asterisksounds:ro
       - ./data/capturethephone:/App/PersistedData
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.capturethephone-https.rule=Host(`capturethephone.co.uk`)" #edit this to add your (sub?)domain
+      - "traefik.http.routers.capturethephone-https.entrypoints=websecure"
+      - "traefik.http.routers.capturethephone-https.tls=true"
+      - "traefik.http.services.capturethephone-https.loadbalancer.server.port=8080"
+      - "traefik.http.routers.capturethephone-https.tls.certresolver=le"
+
+  traefik:
+    image: traefik:v3.0
+    restart: unless-stopped
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=your_email@example.com" #edit this to add your email
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     ports:
-      - 5293:8080
-  
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/traefik:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -19,4 +46,4 @@ services:
     environment:
       POSTGRES_DB: CutelCaptureThePhone
       POSTGRES_USER: CutelCaptureThePhone
-      POSTGRES_PASSWORD: change_me_to_match_backend_appsettings
+      POSTGRES_PASSWORD: change_me_to_match_backend_appsettings #edit this to add your password
