@@ -114,8 +114,4 @@
       <_ContentIncludedByDefault Remove="PersistedData\appsettings.json" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="wwwroot\js\" />
-    </ItemGroup>
-
 </Project>

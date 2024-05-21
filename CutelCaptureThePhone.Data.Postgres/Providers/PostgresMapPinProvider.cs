@@ -66,7 +66,45 @@ namespace CutelCaptureThePhone.Data.Postgres.Providers
 
             return newPin.ToModel();
         }
-        
+
+        public async Task<MapPinModel> UpdateAsync(string currentNumber, MapPinModel model)
+        {
+            IDbContextTransaction transaction = await db.Database.BeginTransactionAsync();
+
+            MapPin? existingPin;
+            
+            try
+            {
+                existingPin = await db.MapPins.SingleOrDefaultAsync(e => e.Number == currentNumber);
+
+                if (existingPin is null) throw new KeyNotFoundException("the map pin number could not be found");
+
+                existingPin.Lat = model.Lat;
+                existingPin.Long = model.Long;
+                existingPin.Name = model.Name;
+                existingPin.Number = model.Number;
+
+                await db.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                await transaction.RollbackAsync();
+                
+                if (e.InnerException!.Message.Contains("duplicate key")) throw new DuplicateNameException("A conflicting map pin already exists");
+
+                throw;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+
+                throw;
+            }
+
+            return existingPin.ToModel();
+        }
+
         public async Task DeleteAsync(uint id)
         {
             await using IDbContextTransaction tran = await db.Database.BeginTransactionAsync();

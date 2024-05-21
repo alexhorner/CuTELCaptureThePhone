@@ -24,7 +24,7 @@
     
     <p>
         All phones have a cooldown, in which only one player may capture it. If someone in front of you just captured the phone, you'll need to wait for the phone to cool down before your turn. Additionally, each phone has a player cooldown too,
-        where you can only capture each phone once per day, so make sure to go and capture as many unique phones as you can!
+        where you can only personally capture each phone once in a longer cooldown period, so make sure to go and capture as many unique phones as you can!
     </p>
     
     <div id="map" style="height: 50rem;"></div>
@@ -40,8 +40,10 @@
     <script>
         let popupContentTemplate = document.getElementById("pinPopupTemplate");
         let popupScratchSpace = document.getElementById("popupScratchSpace");
+
+        let defaultLatLng = [52.0411, -2.3784];
         
-        let map = L.map('map').setView([52.0411, -2.3784], 17);
+        let map = L.map('map').setView(defaultLatLng, 17);
 
         let gl = L.maplibreGL({
             style: emfMapStyle
@@ -56,10 +58,6 @@
 
         fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
             data.forEach(pin => {
-                let pinMarker = L.marker([pin.lat, pin.long], {
-                    icon: pinIcon
-                }).addTo(map);
-
                 let popupContent = popupContentTemplate.content.cloneNode(true);
 
                 popupContent.querySelector('[data-sel="name"]').innerText = pin.name;
@@ -73,10 +71,13 @@
 
                 popupScratchSpace.innerHTML = null;
                 popupScratchSpace.appendChild(popupContent);
+                
+                let pinMarker = L.marker([pin.lat, pin.long], {
+                    icon: pinIcon
+                }).addTo(map);
 
                 pinMarker.bindPopup(popupScratchSpace.innerHTML);
             });
         });
-    
     </script>
 }

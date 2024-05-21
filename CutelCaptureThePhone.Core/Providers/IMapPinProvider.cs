@@ -10,6 +10,7 @@ namespace CutelCaptureThePhone.Core.Providers
         Task<List<MapPinModel>> GetAllAsync();
         Task<(List<MapPinModel> Pins, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10);
         Task<MapPinModel> CreateAsync(MapPinModel model);
+        Task<MapPinModel> UpdateAsync(string currentNumber, MapPinModel model);
         Task DeleteAsync(uint id);
     }
 }

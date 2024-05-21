@@ -220,7 +220,7 @@ namespace CutelCaptureThePhone.Web.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> MapPinCreate([FromForm] string name, [FromForm] string number, [FromForm] decimal latitude, [FromForm] decimal longitude)
+        public async Task<IActionResult> MapPinCreate([FromForm] string name, [FromForm] string number, [FromForm] decimal latitude, [FromForm] decimal longitude, [FromForm] string? edit)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -240,30 +240,66 @@ namespace CutelCaptureThePhone.Web.Controllers
                 return RedirectToAction("MapPins");
             }
 
-            try
+            if (!string.IsNullOrWhiteSpace(edit))
             {
-                await mapPinProvider.CreateAsync(new MapPinModel
+                try
                 {
-                    Name = name,
-                    Number = number,
-                    Lat = latitude,
-                    Long = longitude
-                });
-            }
-            catch (DuplicateNameException)
-            {
-                TempData["Error"] = "A map pin with this number already exists";
-                return RedirectToAction("MapPins");
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"Failed to create a new map pin with name '{name}' and number {number} at lat/long {latitude}/{longitude}");
+                    await mapPinProvider.UpdateAsync(edit, new MapPinModel
+                    {
+                        Name = name,
+                        Number = number,
+                        Lat = latitude,
+                        Long = longitude
+                    });
+                }
+                catch (DuplicateNameException)
+                {
+                    TempData["Error"] = "A map pin with this number already exists";
+                    return RedirectToAction("MapPins");
+                }
+                catch (KeyNotFoundException)
+                {
+                    TempData["Error"] = "A map pin with the original number could not be found";
+                    return RedirectToAction("MapPins");
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Failed to update a map pin with original number {edit} to name '{name}' and number {number} at lat/long {latitude}/{longitude}");
                 
-                TempData["Error"] = "An error occured creating the map pin. Please try again";
-                return RedirectToAction("MapPins");
+                    TempData["Error"] = "An error occured updating the map pin. Please try again";
+                    return RedirectToAction("MapPins");
+                }
+                
+                TempData["Message"] = "The map pin has been successfully updated";
             }
-
-            TempData["Message"] = "The map pin has been successfully created";
+            else
+            {
+                try
+                {
+                    await mapPinProvider.CreateAsync(new MapPinModel
+                    {
+                        Name = name,
+                        Number = number,
+                        Lat = latitude,
+                        Long = longitude
+                    });
+                }
+                catch (DuplicateNameException)
+                {
+                    TempData["Error"] = "A map pin with this number already exists";
+                    return RedirectToAction("MapPins");
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Failed to create a new map pin with name '{name}' and number {number} at lat/long {latitude}/{longitude}");
+                
+                    TempData["Error"] = "An error occured creating the map pin. Please try again";
+                    return RedirectToAction("MapPins");
+                }
+                
+                TempData["Message"] = "The map pin has been successfully created";
+            }
+            
             return RedirectToAction("MapPins");
         }
         

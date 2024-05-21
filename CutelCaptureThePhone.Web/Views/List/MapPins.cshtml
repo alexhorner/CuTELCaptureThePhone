@@ -1,4 +1,5 @@
-﻿@using CutelCaptureThePhone.Core.Models
+﻿@using System.Web
+@using CutelCaptureThePhone.Core.Models
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model MapPinsViewModel
 @{
@@ -39,8 +40,13 @@
 
                 <div id="map" style="height: 50rem;"></div>
 
-                <div class="d-flex flex-row-reverse">
+                <div class="d-flex flex-row-reverse" id="createButtons">
                     <button type="submit" class="btn btn-success mt-2">Create</button>
+                </div>
+
+                <div class="d-none flex-row-reverse" id="editButtons">
+                    <button type="submit" class="btn btn-primary mt-2" id="editSaveButton" name="edit">Save Changes</button>
+                    <button type="button" class="btn btn-secondary mt-2 mx-1" onclick="cancelEditPin();">Cancel</button>
                 </div>
             </form>
         </div>
@@ -63,10 +69,11 @@
                 <td>@pin.Number</td>
                 <td>@(pin.Lat),&nbsp;@pin.Long</td>
                 <td>
-                    <form method="POST" asp-action="MapPinDelete">
+                    <form method="POST" asp-action="MapPinDelete" class="d-inline">
                         <input type="hidden" name="id" value="@pin.Id" />
                         <button class="btn btn-danger">Delete</button>
                     </form>
+                    <button class="btn btn-secondary d-inline" onclick="editPin('@HttpUtility.JavaScriptStringEncode(pin.Number)', '@HttpUtility.JavaScriptStringEncode(pin.Name)');">Edit</button>
                 </td>
             </tr>
         }
@@ -82,12 +89,19 @@
     <script src="~/dist/emfcamp/emfmap.js"></script>
 
     <script>
+        let nameField = document.getElementById("createMapPin-name");
+        let numberField = document.getElementById("createMapPin-number");
         let latitudeField = document.getElementById("createMapPin-latitude");
         let longitudeField = document.getElementById("createMapPin-longitude");
         let popupContentTemplate = document.getElementById("pinPopupTemplate");
         let popupScratchSpace = document.getElementById("popupScratchSpace");
+        let createButtons = document.getElementById("createButtons");
+        let editButtons = document.getElementById("editButtons");
+        let editSaveButton = document.getElementById("editSaveButton");
+
+        let defaultLatLng = [52.0411, -2.3784];
         
-        let map = L.map('map').setView([52.0411, -2.3784], 17);
+        let map = L.map('map').setView(defaultLatLng, 17);
 
         let gl = L.maplibreGL({
             style: emfMapStyle
@@ -100,33 +114,13 @@
             popupAnchor: [0, -50]
         });
 
-        fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
-            data.forEach(pin => {
-                let pinMarker = L.marker([pin.lat, pin.long], {
-                    icon: pinIcon
-                }).addTo(map);
-
-                let popupContent = popupContentTemplate.content.cloneNode(true);
-                
-                popupContent.querySelector('[data-sel="name"]').innerText = pin.name;
-                popupContent.querySelector('[data-sel="number"]').innerText = pin.number;
-                
-                popupContent.querySelector('[data-sel="uniquePlayers"]').innerText = pin.uniquePlayers + " player" + (pin.uniquePlayers === 1 ? "" : "s");
-                popupContent.querySelector('[data-sel="totalCaptures"]').innerText = pin.totalCaptures;
-                
-                popupContent.querySelector('[data-sel="firstCapture"]').innerText = pin.firstCapturingPlayer === null ? "None" : pin.firstCapturingPlayer;
-                popupContent.querySelector('[data-sel="latestCapture"]').innerText = pin.latestCapturingPlayer === null ? "None" : pin.latestCapturingPlayer;
-
-                popupScratchSpace.innerHTML = null;
-                popupScratchSpace.appendChild(popupContent);
-
-                pinMarker.bindPopup(popupScratchSpace.innerHTML);
-            });
-        });
+        let knownPins = {};
 
         let draggableMarker = L.marker([0, 0], {
             draggable: true,
-            autoPan: true
+            autoPan: true,
+            riseOnHover: true,
+            forceZIndex: 1000
         }).addTo(map); //Default to 0,0 so when we set below, it automatically triggers the event which updates the form fields
         
         draggableMarker.addEventListener("move", (e) => {
@@ -142,6 +136,59 @@
             draggableMarker.setLatLng([latitudeField.value, longitudeField.value]);
         });
 
-        draggableMarker.setLatLng([52.0411, -2.3784]);
+        draggableMarker.setLatLng(defaultLatLng);
+
+        fetch("/Api/Game/MapPins").then(res => res.json()).then(data => {
+            data.forEach(pin => {
+                let popupContent = popupContentTemplate.content.cloneNode(true);
+
+                popupContent.querySelector('[data-sel="name"]').innerText = pin.name;
+                popupContent.querySelector('[data-sel="number"]').innerText = pin.number;
+
+                popupContent.querySelector('[data-sel="uniquePlayers"]').innerText = pin.uniquePlayers + " player" + (pin.uniquePlayers === 1 ? "" : "s");
+                popupContent.querySelector('[data-sel="totalCaptures"]').innerText = pin.totalCaptures;
+
+                popupContent.querySelector('[data-sel="firstCapture"]').innerText = pin.firstCapturingPlayer === null ? "None" : pin.firstCapturingPlayer;
+                popupContent.querySelector('[data-sel="latestCapture"]').innerText = pin.latestCapturingPlayer === null ? "None" : pin.latestCapturingPlayer;
+
+                popupScratchSpace.innerHTML = null;
+                popupScratchSpace.appendChild(popupContent);
+                
+                let pinMarker = L.marker([pin.lat, pin.long], {
+                    icon: pinIcon
+                }).addTo(map);
+
+                knownPins[pin.number] = pinMarker;
+
+                pinMarker.bindPopup(popupScratchSpace.innerHTML);
+            });
+        });
+
+        function editPin(pinStatusKey, pinName) {
+            editButtons.classList.remove("d-none");
+            editButtons.classList.add("d-flex");
+            createButtons.classList.remove("d-flex");
+            createButtons.classList.add("d-none");
+
+            numberField.value = editSaveButton.value = pinStatusKey;
+            nameField.value = pinName;
+
+            draggableMarker.setLatLng(knownPins[pinStatusKey].getLatLng());
+
+            window.scrollTo({top: 0, left: 0});
+        }
+
+        function cancelEditPin() {
+            createButtons.classList.remove("d-none");
+            createButtons.classList.add("d-flex");
+            editButtons.classList.remove("d-flex");
+            editButtons.classList.add("d-none");
+
+            numberField.value = editSaveButton.value = "";
+            nameField.value = "";
+
+            draggableMarker.setLatLng(defaultLatLng);
+        }
+    
     </script>
 }
