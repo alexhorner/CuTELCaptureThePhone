@@ -7,6 +7,7 @@ namespace CutelCaptureThePhone.Core.Providers
         Task<bool> ExistsByIdAsync(uint id);
         Task<MapPinModel?> GetByIdAsync(uint id);
         Task<MapPinModel?> GetByNumberAsync(string number);
+        Task<MapPinModel?> GetByCoordinatesAsync(decimal lat, decimal @long);
         Task<List<MapPinModel>> GetAllAsync();
         Task<(List<MapPinModel> Pins, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10);
         Task<MapPinModel> CreateAsync(MapPinModel model);

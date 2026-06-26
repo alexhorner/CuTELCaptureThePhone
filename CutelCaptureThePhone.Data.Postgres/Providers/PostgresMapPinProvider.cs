@@ -25,6 +25,14 @@ namespace CutelCaptureThePhone.Data.Postgres.Providers
             return mapPin?.ToModel();
         }
 
+        public async Task<MapPinModel?> GetByCoordinatesAsync(decimal lat, decimal @long)
+        {
+            //No uniqueness constraint on Lat/Long, unlike Number, so take the first match rather than risking a "more than one element" exception
+            MapPin? mapPin = await db.MapPins.FirstOrDefaultAsync(e => e.Lat == lat && e.Long == @long);
+
+            return mapPin?.ToModel();
+        }
+
         public Task<List<MapPinModel>> GetAllAsync() => db.MapPins.OrderBy(e => e.Created).Select(e => e.ToModel()).ToListAsync();
 
         public async Task<(List<MapPinModel> Pins, PaginationModel Pagination)> GetAllPaginatedAsync(int page, int limit = 10)

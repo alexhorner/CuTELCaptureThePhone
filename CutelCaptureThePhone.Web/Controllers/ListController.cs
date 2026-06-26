@@ -1,5 +1,7 @@
 ﻿using System.Data;
+using System.Text.Json;
 using CutelCaptureThePhone.Web.Authentication.Attributes;
+using CutelCaptureThePhone.Web.EmfCamp;
 using CutelCaptureThePhone.Web.Models;
 using CutelCaptureThePhone.Core.Enums;
 using CutelCaptureThePhone.Core.Models;
@@ -9,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CutelCaptureThePhone.Web.Controllers
 {
     [AuthenticatedOnly]
-    public class ListController(ILogger<ListController> logger, IWhitelistProvider whitelistProvider, IBlacklistProvider blacklistProvider, IMapPinProvider mapPinProvider) : Controller
+    public class ListController(ILogger<ListController> logger, IWhitelistProvider whitelistProvider, IBlacklistProvider blacklistProvider, IMapPinProvider mapPinProvider, EmfCampDataService emfCampDataService) : Controller
     {
         [HttpGet]
         public async Task<IActionResult> Whitelist([FromQuery] int? page)
@@ -332,6 +334,113 @@ namespace CutelCaptureThePhone.Web.Controllers
 
             TempData["Message"] = "The map pin has been successfully deleted";
             return RedirectToAction("MapPins");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MapPinImport()
+        {
+            List<PhonesGeoJsonFeature> phones = await GetImportablePhonesAsync();
+
+            List<MapPinImportPreviewItemModel> previewItems = [];
+
+            foreach (PhonesGeoJsonFeature phone in phones)
+            {
+                decimal longitude = phone.Geometry.Coordinates[0];
+                decimal latitude = phone.Geometry.Coordinates[1];
+
+                MapPinModel? existingPin = await mapPinProvider.GetByCoordinatesAsync(latitude, longitude);
+
+                previewItems.Add(new MapPinImportPreviewItemModel
+                {
+                    Name = phone.Properties.Name,
+                    Number = phone.Properties.Number.ToString(),
+                    Lat = latitude,
+                    Long = longitude,
+                    WillUpdateExisting = existingPin is not null
+                });
+            }
+
+            return View(new MapPinImportViewModel
+            {
+                PreviewItems = previewItems
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MapPinImportRun([FromForm] List<string>? selectedNumbers)
+        {
+            HashSet<string> selected = (selectedNumbers ?? []).ToHashSet();
+
+            List<PhonesGeoJsonFeature> phones = (await GetImportablePhonesAsync())
+                .Where(phone => selected.Contains(phone.Properties.Number.ToString()))
+                .ToList();
+
+            if (phones.Count == 0)
+            {
+                TempData["Warning"] = "No items were selected to import";
+                return RedirectToAction("MapPinImport");
+            }
+
+            int created = 0;
+            int updated = 0;
+            int failed = 0;
+
+            foreach (PhonesGeoJsonFeature phone in phones)
+            {
+                decimal longitude = phone.Geometry.Coordinates[0];
+                decimal latitude = phone.Geometry.Coordinates[1];
+                string name = phone.Properties.Name;
+                string number = phone.Properties.Number.ToString();
+
+                try
+                {
+                    MapPinModel? existingPin = await mapPinProvider.GetByCoordinatesAsync(latitude, longitude);
+
+                    if (existingPin is not null)
+                    {
+                        await mapPinProvider.UpdateAsync(existingPin.Number, new MapPinModel
+                        {
+                            Name = name,
+                            Number = number,
+                            Lat = latitude,
+                            Long = longitude
+                        });
+
+                        updated++;
+                    }
+                    else
+                    {
+                        await mapPinProvider.CreateAsync(new MapPinModel
+                        {
+                            Name = name,
+                            Number = number,
+                            Lat = latitude,
+                            Long = longitude
+                        });
+
+                        created++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Failed to import map pin '{name}' (number {number}) at lat/long {latitude}/{longitude}");
+
+                    failed++;
+                }
+            }
+
+            TempData[failed > 0 ? "Warning" : "Message"] = $"Import complete: {created} created, {updated} updated{(failed > 0 ? $", {failed} failed (see logs)" : "")}";
+
+            return RedirectToAction("MapPinImport");
+        }
+
+        private async Task<List<PhonesGeoJsonFeature>> GetImportablePhonesAsync()
+        {
+            string geoJson = await emfCampDataService.GetPhonesGeoJsonAsync();
+
+            PhonesGeoJsonFeatureCollection? featureCollection = JsonSerializer.Deserialize<PhonesGeoJsonFeatureCollection>(geoJson);
+
+            return featureCollection?.Features ?? [];
         }
     }
 }

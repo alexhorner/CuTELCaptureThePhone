@@ -1,0 +1,68 @@
+@using CutelCaptureThePhone.Web.Models
+@model MapPinImportViewModel
+@{
+    ViewBag.Title = "Import Map Pins";
+}
+
+<div class="container-sm mt-2">
+    <div class="card mb-2">
+        <div class="card-header">
+            Import Map Pins from EMF Phones
+        </div>
+
+        <div class="card-body">
+            <div class="w-100 text-center mb-2">
+                This imports the public phones list published by EMF Camp. Pins are matched by coordinates - a phone at the same location as an existing pin will update it, otherwise a new pin is created.
+            </div>
+
+            @if (Model.PreviewItems.Count == 0)
+            {
+                <div class="w-100 text-center">No phones were found to import</div>
+            }
+            else
+            {
+                <form method="POST" asp-action="MapPinImportRun">
+                    <table class="table table-bordered align-middle">
+                        <tr>
+                            <th><input type="checkbox" id="selectAllImportItems" checked /></th>
+                            <th>Name</th>
+                            <th>Number</th>
+                            <th>Coordinates</th>
+                            <th>Action</th>
+                        </tr>
+
+                        @foreach (MapPinImportPreviewItemModel item in Model.PreviewItems)
+                        {
+                            <tr>
+                                <td><input type="checkbox" class="import-item-checkbox" name="selectedNumbers" value="@item.Number" checked /></td>
+                                <td>@item.Name</td>
+                                <td>@item.Number</td>
+                                <td>@(item.Lat),&nbsp;@item.Long</td>
+                                <td>
+                                    @if (item.WillUpdateExisting)
+                                    {
+                                        <span class="badge bg-primary">Update existing pin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Create new pin</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+
+                    <div class="d-flex flex-row-reverse">
+                        <button type="submit" class="btn btn-success mt-2">Import Selected</button>
+                    </div>
+                </form>
+
+                <script>
+                    document.getElementById("selectAllImportItems").addEventListener("change", (e) => {
+                        document.querySelectorAll(".import-item-checkbox").forEach(checkbox => checkbox.checked = e.target.checked);
+                    });
+                </script>
+            }
+        </div>
+    </div>
+</div>

@@ -8,6 +8,7 @@ using Serilog;
 using CutelCaptureThePhone.Data.Postgres;
 using CutelCaptureThePhone.Web.Authentication;
 using CutelCaptureThePhone.Web.Bruteforce;
+using CutelCaptureThePhone.Web.EmfCamp;
 using Microsoft.AspNetCore.HttpOverrides;
 
 //Initialise application builder
@@ -89,6 +90,7 @@ builder.Services.AddCutelCaptureThePhonePostgres(builder.Configuration.GetConnec
 
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<EmfCampDataService>();
 
 builder.Services.AddSingleton<PlayerUniquePinGenerator>();
 builder.Services.AddSingleton<PlayerUniqueNamesetGenerator>();
