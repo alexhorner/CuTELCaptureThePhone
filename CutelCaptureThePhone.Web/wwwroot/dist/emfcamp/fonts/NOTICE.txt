@@ -1,0 +1,15 @@
+These directories contain glyph range tiles (PBF) rendered from the following
+fonts, redistributed (via https://github.com/emfcamp/map, web/public/fonts/)
+for offline use by the MapLibre GL style in ../emfmap.js. Both fonts are
+licensed under the SIL Open Font License, Version 1.1 (https://scripts.sil.org/OFL):
+
+Open Sans Regular:
+  Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)
+
+Raleway SemiBold:
+  Copyright 2010 The Raleway Project Authors (impallari@gmail.com), with Reserved Font Name "Raleway"
+
+The SIL Open Font License permits redistribution, modification (including
+subsetting into glyph tiles), and bundling, provided the font is not sold by
+itself and any modified versions are not distributed under the original font
+name. Full license text: https://scripts.sil.org/OFL

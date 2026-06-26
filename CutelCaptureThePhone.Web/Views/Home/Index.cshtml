@@ -37,17 +37,27 @@
 {
     <script src="~/dist/emfcamp/emfmap.js"></script>
 
-    <script>
+    <script type="module">
+        import { loadEmfMapIcons, createEmfLayerSwitcher, addEmfLayerSwitcherControl } from "/dist/emfcamp/emfmap-extras.mjs";
+
         let popupContentTemplate = document.getElementById("pinPopupTemplate");
         let popupScratchSpace = document.getElementById("popupScratchSpace");
 
         let defaultLatLng = [52.0411, -2.3784];
-        
+
+        let layerSwitcher = createEmfLayerSwitcher();
+        layerSwitcher.setInitialVisibility(emfMapStyle);
+
         let map = L.map('map').setView(defaultLatLng, 17);
 
         let gl = L.maplibreGL({
-            style: emfMapStyle
+            style: emfMapStyle,
+            attribution: emfMapAttribution
         }).addTo(map);
+
+        let glMap = gl.getMaplibreMap();
+        addEmfLayerSwitcherControl(map, layerSwitcher, glMap);
+        glMap.on('load', () => loadEmfMapIcons(glMap));
 
         let pinIcon = L.icon({
             iconUrl: "/capturethephone-pin.svg",

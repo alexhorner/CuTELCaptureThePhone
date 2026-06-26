@@ -88,7 +88,9 @@
 {
     <script src="~/dist/emfcamp/emfmap.js"></script>
 
-    <script>
+    <script type="module">
+        import { loadEmfMapIcons, createEmfLayerSwitcher, addEmfLayerSwitcherControl } from "/dist/emfcamp/emfmap-extras.mjs";
+
         let nameField = document.getElementById("createMapPin-name");
         let numberField = document.getElementById("createMapPin-number");
         let latitudeField = document.getElementById("createMapPin-latitude");
@@ -100,12 +102,20 @@
         let editSaveButton = document.getElementById("editSaveButton");
 
         let defaultLatLng = [52.0411, -2.3784];
-        
+
+        let layerSwitcher = createEmfLayerSwitcher();
+        layerSwitcher.setInitialVisibility(emfMapStyle);
+
         let map = L.map('map').setView(defaultLatLng, 17);
 
         let gl = L.maplibreGL({
-            style: emfMapStyle
+            style: emfMapStyle,
+            attribution: emfMapAttribution
         }).addTo(map);
+
+        let glMap = gl.getMaplibreMap();
+        addEmfLayerSwitcherControl(map, layerSwitcher, glMap);
+        glMap.on('load', () => loadEmfMapIcons(glMap));
 
         let pinIcon = L.icon({
             iconUrl: "/capturethephone-pin.svg",
@@ -164,7 +174,9 @@
             });
         });
 
-        function editPin(pinStatusKey, pinName) {
+        // Exposed on window because the table's onclick="" attributes resolve in global scope,
+        // which a module script's top-level declarations are not part of.
+        window.editPin = function (pinStatusKey, pinName) {
             editButtons.classList.remove("d-none");
             editButtons.classList.add("d-flex");
             createButtons.classList.remove("d-flex");
@@ -176,9 +188,9 @@
             draggableMarker.setLatLng(knownPins[pinStatusKey].getLatLng());
 
             window.scrollTo({top: 0, left: 0});
-        }
+        };
 
-        function cancelEditPin() {
+        window.cancelEditPin = function () {
             createButtons.classList.remove("d-none");
             createButtons.classList.add("d-flex");
             editButtons.classList.remove("d-flex");
@@ -188,7 +200,7 @@
             nameField.value = "";
 
             draggableMarker.setLatLng(defaultLatLng);
-        }
-    
+        };
+
     </script>
 }
