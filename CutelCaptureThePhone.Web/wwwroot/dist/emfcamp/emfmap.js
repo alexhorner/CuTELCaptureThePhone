@@ -36,7 +36,7 @@ let emfMapStyle = {
         },
         "villages": {
             "type": "geojson",
-            "data": "https://www.emfcamp.org/api/villages.geojson"
+            "data": "/Api/EmfCamp/VillagesGeoJson"
         },
         "slope": {
             "type": "raster",

@@ -87,6 +87,9 @@ builder.Services
 //Other services
 builder.Services.AddCutelCaptureThePhonePostgres(builder.Configuration.GetConnectionString("Default")!);
 
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddSingleton<PlayerUniquePinGenerator>();
 builder.Services.AddSingleton<PlayerUniqueNamesetGenerator>();
 builder.Services.AddSingleton<CaptureMessageRandomiser>();
