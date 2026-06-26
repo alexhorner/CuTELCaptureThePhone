@@ -1998,8 +1998,15 @@ let emfMapStyle = {
                         "linear"
                     ],
                     [
-                        "get",
-                        "cores"
+                        "to-number",
+                        [
+                            "coalesce",
+                            [
+                                "get",
+                                "cores"
+                            ],
+                            1
+                        ]
                     ],
                     1,
                     4,
@@ -2034,8 +2041,15 @@ let emfMapStyle = {
                         "linear"
                     ],
                     [
-                        "get",
-                        "cores"
+                        "to-number",
+                        [
+                            "coalesce",
+                            [
+                                "get",
+                                "cores"
+                            ],
+                            1
+                        ]
                     ],
                     1,
                     2,
@@ -2152,8 +2166,15 @@ let emfMapStyle = {
                         "linear"
                     ],
                     [
-                        "get",
-                        "amps"
+                        "to-number",
+                        [
+                            "coalesce",
+                            [
+                                "get",
+                                "amps"
+                            ],
+                            16
+                        ]
                     ],
                     16,
                     1,
