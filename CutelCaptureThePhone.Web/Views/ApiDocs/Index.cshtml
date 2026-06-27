@@ -1,0 +1,96 @@
+@{
+    ViewBag.Title = "API Documentation";
+}
+
+<div class="container-lg">
+    <h2 class="w-100 text-center">Capture The Phone API</h2>
+    <h6 class="w-100 text-center fst-italic mb-5">These endpoints return JSON and may be used freely at EMF Camp to build whatever you like. Try to keep requests at 1 per second or less.</h6>
+    <hr />
+    <p>
+        <span class="badge text-bg-success">GET</span>&nbsp;<a href="https://capturethephone.co.uk/api/leaderboard/public" target="_blank">https://capturethephone.co.uk/api/leaderboard/public</a>
+    </p>
+    
+    <p class="text-muted">
+        This endpoint will return the current leaderboard.
+    </p>
+    
+    <pre>
+{
+  "mostUniqueCapturesPlayer": null || {
+    "name": "Bright Pink Camel",
+    "registeredFromNumber": "123456"
+  },
+  "mostCapturesOverallPlayer": null || {
+    "name": "Jolly Yellow Badger",
+    "registeredFromNumber": "123456"
+  },
+  "playerStats": [
+    {
+      "name": "Jolly Yellow Badger",
+      "registeredFromNumber": "123456",
+      "position": 1,
+      "uniqueCaptures": 25,
+      "totalCaptures": 37,
+      "firstCapture": "12345",
+      "latestCapture": "6789",
+      "periods": {
+        "uniqueCapturesWithin1Hour": 1,
+        "uniqueCapturesWithin12Hours": 1,
+        "uniqueCapturesWithin24Hours": 1,
+        "totalCapturesWithin1Hour": 1,
+        "totalCapturesWithin12Hours": 1,
+        "totalCapturesWithin24Hours": 1
+      }
+    }
+    ...
+  ]
+}</pre>
+    <hr />
+    <p>
+        <span class="badge text-bg-success">GET</span>&nbsp;<a href="https://capturethephone.co.uk/api/game/mappins" target="_blank">https://capturethephone.co.uk/api/game/mappins</a>
+    </p>
+    
+    <p class="text-muted">
+        This endpoint will return all phone pins on the map that can be used to interact with the game
+    </p>
+    
+    <pre>
+[
+  {
+    "lat": 52.042964,
+    "long": -2.375015,
+    "name": "Glastonledburyshire-on-Severn",
+    "number": "4200",
+    "uniquePlayers": 0,
+    "totalCaptures": 0,
+    "firstCapturingPlayer": null || "Jolly Yellow Badger",
+    "latestCapturingPlayer": null || "Jolly Yellow Badger"
+  }
+  ...
+]</pre>
+</div>
+
+@section Scripts
+{
+    <script>
+        (function(d) {
+            stylizePreElements = function() {
+                let preElements = document.getElementsByTagName("pre");
+                for (i = 0; i < preElements.length; ++i) {
+                    let preElement = preElements[i];
+                    preElement.className += "prettyprint";
+                }
+            };
+
+            injectPrettifyScript = function() {
+                let scriptElement = document.createElement('script');
+                scriptElement.setAttribute("src", "https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js");
+                document.head.appendChild(scriptElement);
+            };
+
+            stylizePreElements();
+            injectPrettifyScript();
+
+        })(document)
+    </script>
+}
